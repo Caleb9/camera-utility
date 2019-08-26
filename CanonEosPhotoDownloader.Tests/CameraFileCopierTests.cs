@@ -8,9 +8,9 @@ using NUnit.Framework;
 namespace CanonEosPhotoDownloader.Tests
 {
     [TestFixture]
-    [TestOf(typeof(CameraImageCopier))]
+    [TestOf(typeof(CameraFileCopier))]
     [ExcludeFromCodeCoverage]
-    public sealed class CameraImageCopierTests
+    public sealed class CameraFileCopierTests
     {
         private IFixture NewFixture()
         {
@@ -18,19 +18,19 @@ namespace CanonEosPhotoDownloader.Tests
         }
 
         [Test]
-        [TestOf(nameof(CameraImageCopier.CopyFiles))]
-        public void CopyFiles_DryRun_DoesNotModifyFileSystem()
+        [TestOf(nameof(ICameraFileCopier.CopyCameraFiles))]
+        public void CopyCameraFiles_DryRun_DoesNotModifyFileSystem()
         {
             var fixture = NewFixture();
             var fileSystemMock = fixture.Freeze<Mock<IFileSystem>>();
-            var sut = fixture.Create<CameraImageCopier>();
+            ICameraFileCopier sut = fixture.Create<CameraFileCopier>();
 
-            sut.CopyFiles("sourceDir", "destDir", true);
+            sut.CopyCameraFiles("sourceDir", "destDir", true);
 
             fileSystemMock.Verify(
                 fs => fs.CreateDirectoryIfNotExists(It.IsAny<string>()), Times.Never);
             fileSystemMock.Verify(
-                fs => fs.FileCopyIfDoesNotExist(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+                fs => fs.CopyFileIfDoesNotExist(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
     }
 }

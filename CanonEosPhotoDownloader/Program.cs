@@ -10,30 +10,43 @@ namespace CanonEosPhotoDownloader
 {
     public class Program
     {
-        [NotNull] private readonly ICameraFileFinder _cameraFileFinder;
-        [NotNull] private readonly ICameraFileNameConverter _cameraFileNameConverter;
-        [NotNull] private readonly IFileSystem _fileSystem;
+        [NotNull] private readonly ICameraFileCopier _cameraFileCopier;
 
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global") /* Used implicitly by AutoFixture in tests */]
         public Program(
             [NotNull] IFileSystem fileSystem,
             [NotNull] IMetadataReader metadataReader)
         {
-            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-            _cameraFileFinder =
-                new CameraFileFinder(
-                    fileSystem);
-            _cameraFileNameConverter =
-                new CameraFileNameConverter(
-                    metadataReader,
-                    new CameraFileFactory(),
-                    fileSystem);
+            if (fileSystem == null)
+            {
+                throw new ArgumentNullException(nameof(fileSystem));
+            }
+
+            if (metadataReader == null)
+            {
+                throw new ArgumentNullException(nameof(metadataReader));
+            }
+
+            /* Composition Root. Out of process resources can be swapped with fakes in tests. */
+            _cameraFileCopier = 
+                new ExceptionHandlingCameraFileCopierDecorator(
+                    new CameraFileCopier(
+                        fileSystem,
+                        new CameraFileFinder(
+                            fileSystem),
+                        new CameraFileNameConverter(
+                            metadataReader,
+                            new CameraFileFactory(),
+                            fileSystem))
+                    {
+                        Console = Console.Out
+                    });
         }
 
         public static void Main(
             [NotNull] [ItemNotNull] string[] args)
         {
-            /* Composition Root */
+            /* Compose the application with "real" implementations of FileSystem and MetadataReader. */
             var program = new Program(
                 new FileSystem(),
                 new MetadataReader());
@@ -44,19 +57,17 @@ namespace CanonEosPhotoDownloader
         public void Execute(
             [NotNull] [ItemNotNull] params string[] args)
         {
-            var copier =
-                new CameraImageCopier(
-                    _fileSystem,
-                    _cameraFileFinder,
-                    _cameraFileNameConverter)
-                {
-                    Console = Console.Out
-                };
-
             Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(o => copier.CopyFiles(o.SourceDirectory, o.DestinationDirectory, o.DryRun));
+                .WithParsed(o => 
+                    _cameraFileCopier.CopyCameraFiles(
+                        o.SourceDirectory,
+                        o.DestinationDirectory,
+                        o.DryRun));
         }
 
+        /// <summary>
+        ///     Command line options.
+        /// </summary>
         [UsedImplicitly]
         internal sealed class Options
         {

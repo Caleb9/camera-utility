@@ -6,13 +6,18 @@ using JetBrains.Annotations;
 
 namespace CanonEosPhotoDownloader
 {
-    public sealed class CameraImageCopier
+    /// <summary>
+    ///     Orchestrator for finding images and videos in source directory, and copying them to destination directory
+    ///     (with changed name).
+    /// </summary>
+    public sealed class CameraFileCopier
+        : ICameraFileCopier
     {
         [NotNull] private readonly ICameraFileFinder _cameraFileFinder;
         [NotNull] private readonly ICameraFileNameConverter _cameraFileNameConverter;
         [NotNull] private readonly IFileSystem _fileSystem;
 
-        public CameraImageCopier(
+        public CameraFileCopier(
             [NotNull] IFileSystem fileSystem,
             [NotNull] ICameraFileFinder cameraFileFinder,
             [NotNull] ICameraFileNameConverter cameraFileNameConverter)
@@ -24,12 +29,17 @@ namespace CanonEosPhotoDownloader
                                        throw new ArgumentNullException(nameof(cameraFileNameConverter));
         }
 
+        /// <summary>
+        ///     TextWriter to write output of the program to. By default it is TextWriter.Null so no output is
+        ///     generated (useful in tests), but <see cref="Program"/> sets it to System.IO.Console.Out so output is
+        ///     printed to the console.
+        /// </summary>
         [CanBeNull] internal TextWriter Console { private get; set; } = TextWriter.Null;
 
-        public void CopyFiles(
-            [NotNull] string sourceDirectory,
-            [NotNull] string destinationDirectoryRoot,
-            bool dryRun = false)
+        void ICameraFileCopier.CopyCameraFiles(
+            string sourceDirectory,
+            string destinationDirectoryRoot,
+            bool dryRun)
         {
             if (string.IsNullOrWhiteSpace(sourceDirectory))
             {
@@ -41,7 +51,7 @@ namespace CanonEosPhotoDownloader
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(destinationDirectoryRoot));
             }
 
-            foreach (var cameraFilePath in _cameraFileFinder.FindFilePaths(sourceDirectory))
+            foreach (var cameraFilePath in _cameraFileFinder.FindCameraFiles(sourceDirectory))
             {
                 CopyFile(cameraFilePath, destinationDirectoryRoot, dryRun);
             }
@@ -78,7 +88,7 @@ namespace CanonEosPhotoDownloader
             }
 
             Console?.WriteLine(
-                _fileSystem.FileCopyIfDoesNotExist(cameraFilePath, destinationFileFullName)
+                _fileSystem.CopyFileIfDoesNotExist(cameraFilePath, destinationFileFullName)
                     ? $"{cameraFilePath} -> {destinationFileFullName}"
                     : $"Skipped {cameraFilePath} ({destinationFileFullName} already exists).");
         }

@@ -21,7 +21,7 @@ namespace CanonEosPhotoDownloader.Exif
         private sealed class MetadataExtractorTagAdapter : ITag
         {
             /// <summary>
-            ///     Currently used only in debugger.
+            ///     Currently used only by debugger.
             /// </summary>
             [NotNull] 
             [SuppressMessage("ReSharper", "PrivateFieldCanBeConvertedToLocalVariable")]

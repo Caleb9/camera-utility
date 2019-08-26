@@ -27,7 +27,7 @@ namespace CanonEosPhotoDownloader
 
         [NotNull]
         [ItemNotNull]
-        IEnumerable<string> ICameraFileFinder.FindFilePaths(string directory)
+        IEnumerable<string> ICameraFileFinder.FindCameraFiles(string directory)
         {
             return ImageFileExtensions.SelectMany(extension => FindFilePaths(directory, extension));
         }

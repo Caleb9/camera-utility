@@ -25,7 +25,7 @@ namespace CanonEosPhotoDownloader.FileSystemIsolation
             return exists;
         }
 
-        bool IFileSystem.FileCopyIfDoesNotExist(
+        bool IFileSystem.CopyFileIfDoesNotExist(
             string source,
             string destination)
         {
@@ -69,7 +69,7 @@ namespace CanonEosPhotoDownloader.FileSystemIsolation
                 SearchOption.AllDirectories);
         }
 
-        string IFileSystem.PathCombine(
+        string IFileSystem.CombinePaths(
             params string[] paths)
         {
             return Path.Combine(paths);

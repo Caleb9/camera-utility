@@ -21,7 +21,7 @@ namespace CanonEosPhotoDownloader.Tests
             var fixture = new Fixture().Customize(new AutoMoqCustomization());
             fixture
                 .Freeze<Mock<IFileSystem>>()
-                .Setup(fs => fs.PathCombine(It.IsAny<string[]>()))
+                .Setup(fs => fs.CombinePaths(It.IsAny<string[]>()))
                 .Returns<string[]>(paths => string.Join('/', paths));
             return fixture;
         }

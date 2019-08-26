@@ -36,7 +36,7 @@ namespace CanonEosPhotoDownloader.Tests
             /* Lock otherwise system-dependent behavior of Path.Combine, so tests don't have to consider if they're
              * executed in Windows or Linux. */
             fakeFileSystem
-                .Setup(fs => fs.PathCombine(It.IsAny<string[]>()))
+                .Setup(fs => fs.CombinePaths(It.IsAny<string[]>()))
                 .Returns<string[]>(paths => string.Join('/', paths));
 
             return fakeFileSystem;
@@ -76,12 +76,12 @@ namespace CanonEosPhotoDownloader.Tests
 
         private void AssertFileCopied(Mock<IFileSystem> fileSystemMock, string sourceFile, string destinationFile)
         {
-            fileSystemMock.Verify(fs => fs.FileCopyIfDoesNotExist(sourceFile, destinationFile), Times.Once);
+            fileSystemMock.Verify(fs => fs.CopyFileIfDoesNotExist(sourceFile, destinationFile), Times.Once);
         }
 
         [Test]
         [TestOf(nameof(Program.Execute))]
-        public void FourImageFiles_FilesGetCopied()
+        public void Execute_FourImageFiles_FilesGetCopied()
         {
             /* Arrange */
             var fixture = NewFixture();

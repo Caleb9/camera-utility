@@ -27,15 +27,28 @@ namespace CanonEosPhotoDownloader
             string cameraFilePath,
             string destinationRootPath)
         {
-            var metadataTags = _metadataReader.ExtractTags(cameraFilePath);
-            var cameraFile = _cameraFileFactory.Create(cameraFilePath, metadataTags);
-
-            var destinationSubDirectory = GetDateSubDirectoryName(cameraFile.Created);
-            var destinationDirectory = _fileSystem.PathCombine(destinationRootPath, destinationSubDirectory);
-            var fileName = NewCameraFileName(cameraFile);
-            var destinationFileFullName = _fileSystem.PathCombine(destinationDirectory, fileName);
+            var cameraFile = GetCameraFile(cameraFilePath);
+            var destinationDirectory = GetDestinationDirectory(destinationRootPath, cameraFile);
+            var destinationFileFullName = GetDestinationFileFullName(destinationDirectory, cameraFile);
 
             return (destinationDirectory, destinationFileFullName);
+        }
+
+        [NotNull]
+        private ICameraFile GetCameraFile(
+            [NotNull] string cameraFilePath)
+        {
+            var metadataTags = _metadataReader.ExtractTags(cameraFilePath);
+            return _cameraFileFactory.Create(cameraFilePath, metadataTags);
+        }
+
+        [NotNull]
+        private string GetDestinationDirectory(
+            [NotNull] string destinationRootPath,
+            [NotNull] ICameraFile cameraFile)
+        {
+            var destinationSubDirectory = GetDateSubDirectoryName(cameraFile.Created);
+            return _fileSystem.CombinePaths(destinationRootPath, destinationSubDirectory);
         }
 
         [NotNull]
@@ -43,6 +56,16 @@ namespace CanonEosPhotoDownloader
             DateTime created)
         {
             return $"{created.Year:0000}_{created.Month:00}_{created.Day:00}";
+        }
+
+        [NotNull]
+        private string GetDestinationFileFullName(
+            [NotNull] string destinationDirectory, 
+            [NotNull] ICameraFile cameraFile)
+        {
+            var fileName = NewCameraFileName(cameraFile);
+            var destinationFileFullName = _fileSystem.CombinePaths(destinationDirectory, fileName);
+            return destinationFileFullName;
         }
 
         private string NewCameraFileName(

@@ -22,7 +22,7 @@ namespace CanonEosPhotoDownloader.FileSystemIsolation
         [ItemNotNull]
         IEnumerable<string> GetFiles(
             [NotNull] string directory,
-            [NotNull] string searchMask);
+            [NotNull] string searchMask = "*");
 
         /// <summary>
         ///     Checks if directory exists and if not, creates it.
@@ -42,7 +42,8 @@ namespace CanonEosPhotoDownloader.FileSystemIsolation
         /// <summary>
         ///     Concatenates paths with system-dependent path separator ('/' on Unix/Linux and '\' on Windows).
         /// </summary>
-        [NotNull] string CombinePaths(
+        [NotNull]
+        string CombinePaths(
             [NotNull] [ItemNotNull] params string[] paths);
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace CanonEosPhotoDownloader
 
             try
             {
-                return imagePath.Substring(imagePath.LastIndexOf('.')).ToLowerInvariant();
+                return imagePath.Substring(imagePath.LastIndexOf('.'));
             }
             catch (ArgumentOutOfRangeException)
             {

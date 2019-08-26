@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using CanonEosPhotoDownloader.FileSystemIsolation;
@@ -9,7 +10,8 @@ namespace CanonEosPhotoDownloader
 {
     internal sealed class CameraFileFinder : ICameraFileFinder
     {
-        [NotNull] private static readonly string[] ImageFileExtensions =
+        [NotNull]
+        private static readonly string[] ImageFileExtensions =
         {
             ".jpg",
             ".cr2",
@@ -27,20 +29,20 @@ namespace CanonEosPhotoDownloader
 
         [NotNull]
         [ItemNotNull]
-        IEnumerable<string> ICameraFileFinder.FindCameraFiles(string directory)
+        IEnumerable<string> ICameraFileFinder.FindCameraFiles(
+            [NotNull] string directory)
         {
-            return ImageFileExtensions.SelectMany(extension => FindFilePaths(directory, extension));
+            return FindFilePaths(directory).Where(IsCameraFile).AsParallel();
         }
 
         [NotNull]
         [ItemNotNull]
-        private IEnumerable<string> FindFilePaths([NotNull] string directory, string fileExtension)
+        private IEnumerable<string> FindFilePaths(
+            [NotNull] string directory)
         {
             try
             {
-                return _fileSystem.GetFiles(
-                    directory,
-                    $"*{fileExtension}");
+                return _fileSystem.GetFiles(directory);
             }
             catch (DirectoryNotFoundException exception)
             {
@@ -49,6 +51,14 @@ namespace CanonEosPhotoDownloader
                  * directory as entered by the user. */
                 throw new DirectoryNotFoundException($"{directory} directory not found", exception);
             }
+        }
+
+        private bool IsCameraFile(
+            [NotNull] string filePath)
+        {
+            const bool ignoreCase = true;
+            return ImageFileExtensions.Any(
+                extension => filePath.EndsWith(extension, ignoreCase, CultureInfo.InvariantCulture));
         }
     }
 }

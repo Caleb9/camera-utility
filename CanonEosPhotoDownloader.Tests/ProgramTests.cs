@@ -87,17 +87,19 @@ namespace CanonEosPhotoDownloader.Tests
             var fixture = NewFixture();
             var fileSystemMock = fixture.Freeze<Mock<IFileSystem>>();
             SetupDefaultFakeFileSystem(fileSystemMock)
-                .SetupSequence(fs => fs.GetFiles("sourceDir", It.Is<string>(mask => mask.StartsWith("*."))))
-                .Returns(new[] {"sourceDir/IMG_1234.JPG", "sourceDir/IMG_4231.JPG"})
-                .Returns(new[] {"sourceDir/IMG_1234.CR2"})
-                .Returns(new[] {"sourceDir/MVI_1234.MP4"});
+                .Setup(fs => fs.GetFiles("sourceDir", "*"))
+                .Returns(new[] {
+                    "sourceDir/IMG_1234.JPG",
+                    "sourceDir/IMG_4231.JPG",
+                    "sourceDir/IMG_1234.CR2",
+                    "sourceDir/MVI_1234.MP4" });
             fixture
                 .Freeze<Mock<IMetadataReader>>()
                 .SetupSequence(mr => mr.ExtractTags(It.IsAny<string>()))
                 .Returns(NewImageFileTags("2010:01:12 13:14:15", "42"))
                 .Returns(NewImageFileTags("2011:02:13 14:15:16", "43"))
                 .Returns(NewImageFileTags("2012:03:14 15:16:17", "44"))
-                .Returns(new[] {NewQuickTimeCreatedTag("Fri Jun 13 14.15.16 1980")});
+                .Returns(new[] { NewQuickTimeCreatedTag("Fri Jun 13 14.15.16 1980") });
             var sut = fixture.Create<Program>();
 
             /* Act */
@@ -106,16 +108,16 @@ namespace CanonEosPhotoDownloader.Tests
             /* Assert */
             AssertDirectoryCreated(fileSystemMock, "destDir/2010_01_12");
             AssertFileCopied(
-                fileSystemMock, "sourceDir/IMG_1234.JPG", "destDir/2010_01_12/IMG_20100112_131415420.jpg");
+                fileSystemMock, "sourceDir/IMG_1234.JPG", "destDir/2010_01_12/IMG_20100112_131415420.JPG");
             AssertDirectoryCreated(fileSystemMock, "destDir/2011_02_13");
             AssertFileCopied(
-                fileSystemMock, "sourceDir/IMG_4231.JPG", "destDir/2011_02_13/IMG_20110213_141516430.jpg");
+                fileSystemMock, "sourceDir/IMG_4231.JPG", "destDir/2011_02_13/IMG_20110213_141516430.JPG");
             AssertDirectoryCreated(fileSystemMock, "destDir/2012_03_14");
             AssertFileCopied(
-                fileSystemMock, "sourceDir/IMG_1234.CR2", "destDir/2012_03_14/IMG_20120314_151617440.cr2");
+                fileSystemMock, "sourceDir/IMG_1234.CR2", "destDir/2012_03_14/IMG_20120314_151617440.CR2");
             AssertDirectoryCreated(fileSystemMock, "destDir/1980_06_13");
             AssertFileCopied(
-                fileSystemMock, "sourceDir/MVI_1234.MP4", "destDir/1980_06_13/VID_19800613_141516000.mp4");
+                fileSystemMock, "sourceDir/MVI_1234.MP4", "destDir/1980_06_13/VID_19800613_141516000.MP4");
         }
     }
 }

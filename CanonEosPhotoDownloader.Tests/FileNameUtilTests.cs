@@ -14,7 +14,7 @@ namespace CanonEosPhotoDownloader.Tests
         [TestCase("file.asd.ext", ".ext")]
         [TestCase("file", "")]
         [TestCase("", "")]
-        [TestCase("file.EXT", ".ext")]
+        [TestCase("file.EXT", ".EXT")]
         [TestOf(nameof(FileNameUtil.GetExtension))]
         public void GetExtension_InputNotNull_ReturnsCorrectExtension(
             string input, string expected)

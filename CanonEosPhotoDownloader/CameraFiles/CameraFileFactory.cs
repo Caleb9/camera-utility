@@ -8,7 +8,7 @@ namespace CanonEosPhotoDownloader.CameraFiles
     {
         ICameraFile ICameraFileFactory.Create(string filePath, IEnumerable<ITag> metadata)
         {
-            switch (FileNameUtil.GetExtension(filePath))
+            switch (FileNameUtil.GetExtension(filePath).ToLowerInvariant())
             {
                 case ".jpg":
                 case ".cr2":

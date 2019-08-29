@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <Authors>Piotr Karasinski</Authors>
     <Company />
+    <AssemblyName>camera-utility</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CameraUtility.Exif;
+using CameraUtility.Utils;
 
 namespace CameraUtility.CameraFiles
 {

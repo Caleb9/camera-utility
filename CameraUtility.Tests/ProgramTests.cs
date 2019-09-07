@@ -85,6 +85,7 @@ namespace CameraUtility.Tests
         {
             /* Arrange */
             var fixture = NewFixture();
+            fixture.Inject(new Program.Options("sourceDir", "destDir", false, false));
             var fileSystemMock = fixture.Freeze<Mock<IFileSystem>>();
             SetupDefaultFakeFileSystem(fileSystemMock)
                 .Setup(fs => fs.GetFiles("sourceDir", "*"))
@@ -103,7 +104,7 @@ namespace CameraUtility.Tests
             var sut = fixture.Create<Program>();
 
             /* Act */
-            sut.Execute("-s", "sourceDir", "-d", "destDir");
+            sut.Execute();
 
             /* Assert */
             AssertDirectoryCreated(fileSystemMock, "destDir/2010_01_12");

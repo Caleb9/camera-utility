@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using CameraUtility.Utils;
 using JetBrains.Annotations;
 
 namespace CameraUtility.CameraFiles

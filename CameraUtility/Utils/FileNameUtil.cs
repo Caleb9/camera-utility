@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace CameraUtility
+namespace CameraUtility.Utils
 {
     public static class FileNameUtil
     {

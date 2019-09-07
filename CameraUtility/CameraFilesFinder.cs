@@ -8,10 +8,10 @@ using JetBrains.Annotations;
 
 namespace CameraUtility
 {
-    internal sealed class CameraFileFinder : ICameraFileFinder
+    internal sealed class CameraFilesFinder : ICameraFilesFinder
     {
         [NotNull]
-        private static readonly string[] ImageFileExtensions =
+        private static readonly string[] CameraFileExtensions =
         {
             ".jpg",
             ".cr2",
@@ -21,7 +21,7 @@ namespace CameraUtility
 
         [NotNull] private readonly IFileSystem _fileSystem;
 
-        internal CameraFileFinder(
+        internal CameraFilesFinder(
             [NotNull] IFileSystem fileSystem)
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
@@ -29,7 +29,7 @@ namespace CameraUtility
 
         [NotNull]
         [ItemNotNull]
-        IEnumerable<string> ICameraFileFinder.FindCameraFiles(
+        IEnumerable<string> ICameraFilesFinder.FindCameraFiles(
             [NotNull] string directory)
         {
             return FindFilePaths(directory).Where(IsCameraFile).AsParallel();
@@ -57,8 +57,8 @@ namespace CameraUtility
             [NotNull] string filePath)
         {
             const bool ignoreCase = true;
-            return ImageFileExtensions.Any(
-                extension => filePath.EndsWith(extension, ignoreCase, CultureInfo.InvariantCulture));
+            return CameraFileExtensions.Any(
+                supportedExtension => filePath.EndsWith(supportedExtension, ignoreCase, CultureInfo.InvariantCulture));
         }
     }
 }

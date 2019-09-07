@@ -2,7 +2,7 @@
 
 namespace CameraUtility
 {
-    public interface ICameraFileFinder
+    public interface ICameraFilesFinder
     {
         /// <summary>
         ///    Finds all the files of supported types located in <paramref name="directory"/> and its sub-directories.

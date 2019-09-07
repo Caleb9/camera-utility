@@ -19,10 +19,10 @@ namespace CameraUtility.FileSystemIsolation
             if (!exists)
             {
                 Directory.CreateDirectory(path);
+                Debug.WriteLine($"Created {path}");
             }
 
-            Debug.WriteLineIf(!exists, $"Created {path}");
-            return exists;
+            return !exists;
         }
 
         bool IFileSystem.CopyFileIfDoesNotExist(

@@ -18,14 +18,14 @@ namespace CameraUtility.Tests
         }
 
         [Test]
-        [TestOf(nameof(ICameraFileCopier.CopyCameraFiles))]
+        [TestOf(nameof(ICameraFileCopier.PretendCopyFile))]
         public void CopyCameraFiles_DryRun_DoesNotModifyFileSystem()
         {
             var fixture = NewFixture();
             var fileSystemMock = fixture.Freeze<Mock<IFileSystem>>();
             ICameraFileCopier sut = fixture.Create<CameraFileCopier>();
 
-            sut.CopyCameraFiles("sourceDir", "destDir", true);
+            sut.PretendCopyFile("sourceDir", "destDir");
 
             fileSystemMock.Verify(
                 fs => fs.CreateDirectoryIfNotExists(It.IsAny<string>()), Times.Never);

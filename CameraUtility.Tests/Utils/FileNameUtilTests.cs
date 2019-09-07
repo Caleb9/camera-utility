@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using CameraUtility.Utils;
 using NUnit.Framework;
 
-namespace CameraUtility.Tests
+namespace CameraUtility.Tests.Utils
 {
     [TestFixture]
     [TestOf(typeof(FileNameUtil))]

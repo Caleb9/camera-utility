@@ -9,6 +9,7 @@ using CameraUtility.FileSystemIsolation;
 using CameraUtility.Reporting;
 using CommandLine;
 using JetBrains.Annotations;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace CameraUtility
 {

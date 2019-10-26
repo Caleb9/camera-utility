@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using JetBrains.Annotations;
 using MetadataExtractor;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace CameraUtility.Exif
 {

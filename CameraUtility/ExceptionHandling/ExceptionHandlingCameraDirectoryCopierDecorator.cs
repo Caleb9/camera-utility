@@ -18,12 +18,11 @@ namespace CameraUtility.ExceptionHandling
         void ICameraDirectoryCopier.CopyCameraFiles(
             string sourceDirectory,
             string destinationDirectoryRoot,
-            bool pretend,
             CancellationToken cancellationToken)
         {
             try
             {
-                _decorated.CopyCameraFiles(sourceDirectory, destinationDirectoryRoot, pretend, cancellationToken);
+                _decorated.CopyCameraFiles(sourceDirectory, destinationDirectoryRoot, cancellationToken);
             }
             catch (Exception exception) when (!(exception is OperationCanceledException))
             {

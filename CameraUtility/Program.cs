@@ -56,7 +56,8 @@ namespace CameraUtility
                                         new ExceptionHandlingCameraFileFactoryDecorator(
                                             new CameraFileFactory()),
                                         fileSystem),
-                                    fileSystem)
+                                    fileSystem,
+                                    options.DryRun)
                                 {
                                     Console = Console.Out
                                 },
@@ -116,7 +117,6 @@ namespace CameraUtility
             _cameraDirectoryCopier.CopyCameraFiles(
                 _options.SourceDirectory,
                 _options.DestinationDirectory,
-                _options.DryRun,
                 _cancellationTokenSource.Token);
         }
 

@@ -8,13 +8,16 @@ namespace CameraUtility
     {
         [NotNull] private readonly ICameraFileNameConverter _cameraFileNameConverter;
         [NotNull] private readonly IFileSystem _fileSystem;
+        private readonly bool _pretend;
 
         public CameraFileCopier(
             [NotNull] ICameraFileNameConverter cameraFileNameConverter,
-            [NotNull] IFileSystem fileSystem)
+            [NotNull] IFileSystem fileSystem,
+            bool pretend)
         {
             _cameraFileNameConverter = cameraFileNameConverter;
             _fileSystem = fileSystem;
+            _pretend = pretend;
         }
 
         /// <summary>
@@ -32,28 +35,17 @@ namespace CameraUtility
             var (destinationPath, destinationFileFullName) =
                 _cameraFileNameConverter.Convert(cameraFilePath, destinationDirectoryRoot);
 
-            if (_fileSystem.CreateDirectoryIfNotExists(destinationPath))
+            if (_fileSystem.CreateDirectoryIfNotExists(destinationPath, _pretend))
             {
                 Console?.WriteLine($"Created {destinationPath}");
             }
 
+            var copied = _fileSystem.CopyFileIfDoesNotExist(cameraFilePath, destinationFileFullName, _pretend);
+
             Console?.WriteLine(
-                _fileSystem.CopyFileIfDoesNotExist(cameraFilePath, destinationFileFullName)
+                copied
                     ? $"{cameraFilePath} -> {destinationFileFullName}"
                     : $"Skipped {cameraFilePath} ({destinationFileFullName} already exists).");
-        }
-
-        void ICameraFileCopier.PretendCopyFile(
-            string cameraFilePath,
-            string destinationDirectoryRoot)
-        {
-            var (_, destinationFileFullName) =
-                _cameraFileNameConverter.Convert(cameraFilePath, destinationDirectoryRoot);
-
-            Console?.WriteLine(
-                !_fileSystem.Exists(destinationFileFullName)
-                    ? $"{cameraFilePath} -> {destinationFileFullName}"
-                    : $"Skip {cameraFilePath} ({destinationFileFullName} already exists).");
         }
     }
 }

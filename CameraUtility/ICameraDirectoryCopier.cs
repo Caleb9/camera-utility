@@ -21,14 +21,10 @@ namespace CameraUtility
         ///     Directory where files will be copied to auto-created sub-directories. Sub-directory names are generated
         ///     from files creation date (extracted from metadata), e.g. {destinationDirectoryRoot}/2019_08_26/.
         /// </param>
-        /// <param name="pretend">
-        ///     If true, files will not be copied, but new names will be detected and printed out.
-        /// </param>
         /// <param name="cancellationToken"></param>
         void CopyCameraFiles(
             [NotNull] string sourceDirectory,
             [NotNull] string destinationDirectoryRoot,
-            bool pretend = false,
             CancellationToken cancellationToken = default);
     }
 }

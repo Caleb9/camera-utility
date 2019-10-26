@@ -24,17 +24,25 @@ namespace CameraUtility.Reporting
             return _decorated.GetFiles(directory, searchMask);
         }
 
-        bool IFileSystem.CreateDirectoryIfNotExists(string path)
+        bool IFileSystem.CreateDirectoryIfNotExists(
+            string path,
+            bool pretend)
         {
-            return _decorated.CreateDirectoryIfNotExists(path);
+            return _decorated.CreateDirectoryIfNotExists(path, pretend);
         }
 
-        bool IFileSystem.CopyFileIfDoesNotExist(string source, string destination)
+        bool IFileSystem.CopyFileIfDoesNotExist(
+            string source,
+            string destination,
+            bool pretend)
         {
-            var result = _decorated.CopyFileIfDoesNotExist(source, destination);
+            var result = _decorated.CopyFileIfDoesNotExist(source, destination, pretend);
             if (result)
             {
-                _report.IncrementNumberOfFilesCopied();
+                if (!pretend)
+                {
+                    _report.IncrementNumberOfFilesCopied();
+                }
             }
             else
             {

@@ -71,12 +71,12 @@ namespace CameraUtility.Tests
 
         private void AssertDirectoryCreated(Mock<IFileSystem> fileSystemMock, string directory)
         {
-            fileSystemMock.Verify(fs => fs.CreateDirectoryIfNotExists(directory), Times.AtLeastOnce);
+            fileSystemMock.Verify(fs => fs.CreateDirectoryIfNotExists(directory, false), Times.AtLeastOnce);
         }
 
         private void AssertFileCopied(Mock<IFileSystem> fileSystemMock, string sourceFile, string destinationFile)
         {
-            fileSystemMock.Verify(fs => fs.CopyFileIfDoesNotExist(sourceFile, destinationFile), Times.Once);
+            fileSystemMock.Verify(fs => fs.CopyFileIfDoesNotExist(sourceFile, destinationFile, false), Times.Once);
         }
 
         [Test]

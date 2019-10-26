@@ -27,17 +27,28 @@ namespace CameraUtility.FileSystemIsolation
         /// <summary>
         ///     Checks if directory exists and if not, creates it.
         /// </summary>
+        /// <param name="path"></param>
+        /// <param name="pretend">
+        ///     If true, files will not be copied, but new names will be detected and printed out.
+        /// </param>
         /// <returns>True if directory was created; false if it already exists.</returns>
         bool CreateDirectoryIfNotExists(
-            [NotNull] string path);
+            [NotNull] string path,
+            bool pretend);
 
         /// <summary>
         ///     Checks if destination file exists and if not, copies source to destination.
         /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="pretend">
+        ///     If true, files will not be copied, but new names will be detected and printed out.
+        /// </param>
         /// <returns>True if source file was copied to destination; false if it already exists.</returns>
         bool CopyFileIfDoesNotExist(
             [NotNull] string source,
-            [NotNull] string destination);
+            [NotNull] string destination,
+            bool pretend);
 
         /// <summary>
         ///     Concatenates paths with system-dependent path separator ('/' on Unix/Linux and '\' on Windows).

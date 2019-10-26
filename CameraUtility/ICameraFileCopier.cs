@@ -7,9 +7,5 @@ namespace CameraUtility
         void ExecuteCopyFile(
             [NotNull] string cameraFilePath,
             [NotNull] string destinationDirectoryRoot);
-
-        void PretendCopyFile(
-            [NotNull] string cameraFilePath,
-            [NotNull] string destinationDirectoryRoot);
     }
 }

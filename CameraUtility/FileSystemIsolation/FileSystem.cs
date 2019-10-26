@@ -8,7 +8,8 @@ namespace CameraUtility.FileSystemIsolation
     internal sealed class FileSystem : IFileSystem
     {
         bool IFileSystem.CreateDirectoryIfNotExists(
-            string path)
+            string path,
+            bool pretend)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -16,18 +17,24 @@ namespace CameraUtility.FileSystemIsolation
             }
 
             var exists = Directory.Exists(path);
-            if (!exists)
+            if (exists)
+            {
+                return false;
+            }
+
+            if (!pretend)
             {
                 Directory.CreateDirectory(path);
                 Debug.WriteLine($"Created {path}");
             }
 
-            return !exists;
+            return true;
         }
 
         bool IFileSystem.CopyFileIfDoesNotExist(
             string source,
-            string destination)
+            string destination,
+            bool pretend)
         {
             if (string.IsNullOrWhiteSpace(source))
             {
@@ -39,14 +46,17 @@ namespace CameraUtility.FileSystemIsolation
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(destination));
             }
 
-            var exists = File.Exists(destination);
-            if (!exists)
+            if (File.Exists(destination))
+            {
+                Debug.WriteLine($"Skipped {source} -> {destination}");
+                return false;
+            }
+            if (!pretend)
             {
                 File.Copy(source, destination, false);
+                Debug.WriteLine($"Copied {source} -> {destination}");
             }
-            Debug.WriteLine((exists ? "Skipped": "Copied ") + $" {source} -> {destination}");
-
-            return !exists;
+            return true;
         }
 
         IEnumerable<string> IFileSystem.GetFiles(

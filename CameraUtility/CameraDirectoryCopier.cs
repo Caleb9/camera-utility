@@ -26,20 +26,12 @@ namespace CameraUtility
         void ICameraDirectoryCopier.CopyCameraFiles(
             string sourceDirectory,
             string destinationDirectoryRoot,
-            bool pretend,
             CancellationToken cancellationToken)
         {
             foreach (var cameraFilePath in _cameraFilesFinder.FindCameraFiles(sourceDirectory))
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (!pretend)
-                {
-                    _cameraFileCopier.ExecuteCopyFile(cameraFilePath, destinationDirectoryRoot);
-                }
-                else
-                {
-                    _cameraFileCopier.PretendCopyFile(cameraFilePath, destinationDirectoryRoot);
-                }
+                _cameraFileCopier.ExecuteCopyFile(cameraFilePath, destinationDirectoryRoot);
             }
         }
     }

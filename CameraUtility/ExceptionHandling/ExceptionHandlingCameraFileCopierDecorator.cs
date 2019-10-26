@@ -31,20 +31,5 @@ namespace CameraUtility.ExceptionHandling
             {
             }
         }
-
-        public void PretendCopyFile(
-            string cameraFilePath,
-            string destinationDirectoryRoot)
-        {
-            try
-            {
-                _decorated.PretendCopyFile(cameraFilePath, destinationDirectoryRoot);
-            }
-            catch (Exception exception) when (_continueOnError &&
-                                              (exception is InvalidMetadataException ||
-                                               exception is InvalidFileException))
-            {
-            }
-        }
     }
 }

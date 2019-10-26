@@ -13,8 +13,9 @@ namespace CameraUtility.Exif
         IEnumerable<ITag> IMetadataReader.ExtractTags(string filePath)
         {
             return ImageMetadataReader.ReadMetadata(filePath)
-                .SelectMany(d => d.Tags)
-                .Select(t => new MetadataExtractorTagAdapter(t));
+                .SelectMany(tagDirectory => tagDirectory.Tags)
+                .Where(tag => !(tag is null))
+                .Select(tag => new MetadataExtractorTagAdapter(tag));
         }
 
         [DebuggerDisplay("[{Directory}] {_name} : {Value}")]
@@ -29,15 +30,15 @@ namespace CameraUtility.Exif
 
             public MetadataExtractorTagAdapter([NotNull] Tag metadataExtractorTag)
             {
-                if (metadataExtractorTag == null)
+                if (metadataExtractorTag is null)
                 {
                     throw new ArgumentNullException(nameof(metadataExtractorTag));
                 }
 
-                Directory = metadataExtractorTag.DirectoryName;
-                Value = metadataExtractorTag.Description;
+                Directory = metadataExtractorTag.DirectoryName ?? string.Empty;
+                Value = metadataExtractorTag.Description ?? string.Empty;
                 Type = metadataExtractorTag.Type;
-                _name = metadataExtractorTag.Name;
+                _name = metadataExtractorTag.Name ?? string.Empty;
             }
 
             public string Directory { get; }

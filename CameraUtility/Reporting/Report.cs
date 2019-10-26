@@ -39,7 +39,7 @@ namespace CameraUtility.Reporting
             [NotNull] string directory,
             int numberOfFiles)
         {
-            if (directory == null)
+            if (directory is null)
             {
                 throw new ArgumentNullException(nameof(directory));
             }
@@ -61,12 +61,12 @@ namespace CameraUtility.Reporting
             [NotNull] string fileName,
             [NotNull] Exception exception)
         {
-            if (fileName == null)
+            if (fileName is null)
             {
                 throw new ArgumentNullException(nameof(fileName));
             }
 
-            if (exception == null)
+            if (exception is null)
             {
                 throw new ArgumentNullException(nameof(exception));
             }

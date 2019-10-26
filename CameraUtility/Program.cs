@@ -27,12 +27,12 @@ namespace CameraUtility
             [NotNull] IMetadataReader metadataReader,
             [NotNull] CancellationTokenSource cancellationTokenSource)
         {
-            if (fileSystem == null)
+            if (fileSystem is null)
             {
                 throw new ArgumentNullException(nameof(fileSystem));
             }
 
-            if (metadataReader == null)
+            if (metadataReader is null)
             {
                 throw new ArgumentNullException(nameof(metadataReader));
             }
@@ -73,7 +73,7 @@ namespace CameraUtility
             [NotNull] [ItemNotNull] string[] args)
         {
             var options = ParseArgs(args);
-            if (options == null)
+            if (options is null)
             {
                 Environment.Exit(1);
             }
@@ -102,11 +102,10 @@ namespace CameraUtility
             }
         }
 
-        [CanBeNull]
-        private static Options ParseArgs(
+        private static Options? ParseArgs(
             [NotNull] IEnumerable<string> args)
         {
-            Options result = null;
+            Options? result = null;
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(options => result = options);
             return result;

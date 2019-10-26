@@ -22,7 +22,7 @@ namespace CameraUtility.CameraFiles
             [NotNull] IEnumerable<ITag> exifTags)
             : base(fullName)
         {
-            if (exifTags == null)
+            if (exifTags is null)
             {
                 throw new ArgumentNullException(nameof(exifTags));
             }

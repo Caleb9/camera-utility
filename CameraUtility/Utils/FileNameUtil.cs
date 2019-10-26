@@ -8,7 +8,7 @@ namespace CameraUtility.Utils
         [NotNull]
         public static string GetExtension([NotNull] string imagePath)
         {
-            if (imagePath == null)
+            if (imagePath is null)
             {
                 throw new ArgumentNullException(nameof(imagePath));
             }

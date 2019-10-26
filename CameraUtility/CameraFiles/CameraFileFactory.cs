@@ -25,7 +25,7 @@ namespace CameraUtility.CameraFiles
 
         private sealed class InvalidPathException : Exception
         {
-            internal InvalidPathException(string message, Exception innerException = null)
+            internal InvalidPathException(string message, Exception? innerException = null)
                 : base(message, innerException)
             {
             }

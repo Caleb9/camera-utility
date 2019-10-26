@@ -32,7 +32,7 @@ namespace CameraUtility.Tests.Utils
         public void GetExtension_InputNull_Throws()
         {
             /* Act */
-            void TestDelegate() => FileNameUtil.GetExtension(null);
+            void TestDelegate() => FileNameUtil.GetExtension(null!);
 
             /* Assert */
             Assert.Throws<ArgumentNullException>(TestDelegate);

@@ -6,6 +6,10 @@
     <Authors>Piotr Karasinski</Authors>
     <Company />
     <AssemblyName>camera-utility</AssemblyName>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
   </PropertyGroup>
 
   <ItemGroup>

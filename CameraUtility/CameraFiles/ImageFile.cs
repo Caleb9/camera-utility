@@ -28,7 +28,7 @@ namespace CameraUtility.CameraFiles
         public ImageFile([NotNull] string fullName, [NotNull] IEnumerable<ITag> exifTags)
             : base(fullName)
         {
-            if (exifTags == null)
+            if (exifTags is null)
             {
                 throw new ArgumentNullException(nameof(exifTags));
             }
@@ -65,7 +65,7 @@ namespace CameraUtility.CameraFiles
             [NotNull] IEnumerable<ITag> exifTags)
         {
             var subSeconds = exifTags.FirstOrDefault(t => t.Type == SubSecondTagType);
-            return subSeconds != null ? ToMilliseconds(int.Parse(subSeconds.Value)) : 0;
+            return subSeconds is null ? 0 : ToMilliseconds(int.Parse(subSeconds.Value));
         }
 
         private int ToMilliseconds(

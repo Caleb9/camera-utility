@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using JetBrains.Annotations;
 
 namespace CameraUtility
 {
@@ -11,12 +10,12 @@ namespace CameraUtility
     public sealed class CameraDirectoryCopier
         : ICameraDirectoryCopier
     {
-        [NotNull] private readonly ICameraFilesFinder _cameraFilesFinder;
-        [NotNull] private readonly ICameraFileCopier _cameraFileCopier;
+        private readonly ICameraFilesFinder _cameraFilesFinder;
+        private readonly ICameraFileCopier _cameraFileCopier;
 
         public CameraDirectoryCopier(
-            [NotNull] ICameraFilesFinder cameraFilesFinder,
-            [NotNull] ICameraFileCopier cameraFileCopier)
+            ICameraFilesFinder cameraFilesFinder,
+            ICameraFileCopier cameraFileCopier)
         {
             _cameraFilesFinder = cameraFilesFinder ?? throw new ArgumentNullException(nameof(cameraFilesFinder));
             _cameraFileCopier =

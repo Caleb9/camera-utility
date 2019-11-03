@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
 using System.Threading;
 using CameraUtility.CameraFiles;
 using CameraUtility.ExceptionHandling;
@@ -8,24 +8,21 @@ using CameraUtility.Exif;
 using CameraUtility.FileSystemIsolation;
 using CameraUtility.Reporting;
 using CommandLine;
-using JetBrains.Annotations;
-using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace CameraUtility
 {
     public class Program
     {
-        [NotNull] private readonly ICameraDirectoryCopier _cameraDirectoryCopier;
-        [NotNull] private readonly CancellationTokenSource _cancellationTokenSource;
-        [NotNull] private readonly Options _options;
-        [NotNull] private readonly Report _report;
+        private readonly ICameraDirectoryCopier _cameraDirectoryCopier;
+        private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly Options _options;
+        private readonly Report _report;
 
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global") /* Used implicitly by AutoFixture in tests */]
-        public Program(
-            [NotNull] Options options,
-            [NotNull] IFileSystem fileSystem,
-            [NotNull] IMetadataReader metadataReader,
-            [NotNull] CancellationTokenSource cancellationTokenSource)
+        private Program(
+            Options options,
+            IFileSystem fileSystem,
+            IMetadataReader metadataReader,
+            CancellationTokenSource cancellationTokenSource)
         {
             if (fileSystem is null)
             {
@@ -66,11 +63,11 @@ namespace CameraUtility
                         )));
             _cancellationTokenSource = cancellationTokenSource ??
                                        throw new ArgumentNullException(nameof(cancellationTokenSource));
-            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _options = options;
         }
 
         public static void Main(
-            [NotNull] [ItemNotNull] string[] args)
+            string[] args)
         {
             var options = ParseArgs(args);
             if (options is null)
@@ -103,23 +100,25 @@ namespace CameraUtility
         }
 
         private static Options? ParseArgs(
-            [NotNull] IEnumerable<string> args)
+            IEnumerable<string> args)
         {
             Options? result = null;
-            Parser.Default.ParseArguments<Options>(args)
+            Parser.Default.ParseArguments<Options?>(args)
                 .WithParsed(options => result = options);
             return result;
         }
 
         public void Execute()
         {
+            Debug.Assert(_options.SourceDirectory != null, "_options.SourceDirectory != null");
+            Debug.Assert(_options.DestinationDirectory != null, "_options.DestinationDirectory != null");
+            
             _cameraDirectoryCopier.CopyCameraFiles(
                 _options.SourceDirectory,
                 _options.DestinationDirectory,
                 _cancellationTokenSource.Token);
         }
 
-        [NotNull]
         private ConsoleCancelEventHandler Abort()
         {
             return (sender, eventArgs) =>
@@ -142,8 +141,8 @@ namespace CameraUtility
         public sealed class Options
         {
             public Options(
-                string sourceDirectory,
-                string destinationDirectory,
+                string? sourceDirectory,
+                string? destinationDirectory,
                 bool dryRun,
                 bool tryContinueOnError)
             {
@@ -155,12 +154,12 @@ namespace CameraUtility
 
             [Option('s', "src-dir", Required = true,
                 HelpText = "Directory containing pictures and/or videos. All sub-directories will be searched too.")]
-            public string SourceDirectory { get; }
+            public string? SourceDirectory { get; }
 
             [Option('d', "dest-dir", Required = true,
                 HelpText = "Destination directory root path where files will be copied into auto-created" +
                            " sub-directories named after file creation date (e.g. 2019_08_22/).")]
-            public string DestinationDirectory { get; }
+            public string? DestinationDirectory { get; }
 
             [Option('n', "dry-run", Required = false, Default = false,
                 HelpText = "If present, no actual files will be copied. " +

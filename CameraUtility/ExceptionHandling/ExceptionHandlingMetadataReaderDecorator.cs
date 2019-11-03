@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using CameraUtility.Exif;
-using JetBrains.Annotations;
 using MetadataExtractor;
 
 namespace CameraUtility.ExceptionHandling
@@ -9,10 +8,10 @@ namespace CameraUtility.ExceptionHandling
     internal sealed class ExceptionHandlingMetadataReaderDecorator
         : IMetadataReader
     {
-        [NotNull] private readonly IMetadataReader _decorated;
+        private readonly IMetadataReader _decorated;
 
         internal ExceptionHandlingMetadataReaderDecorator(
-            [NotNull] IMetadataReader decorated)
+            IMetadataReader decorated)
         {
             _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
         }

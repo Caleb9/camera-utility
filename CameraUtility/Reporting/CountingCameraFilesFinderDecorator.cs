@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace CameraUtility.Reporting
 {
     internal sealed class CountingCameraFilesFinderDecorator
         : ICameraFilesFinder
     {
-        [NotNull] private readonly ICameraFilesFinder _decorated;
-        [NotNull] private readonly Report _report;
+        private readonly ICameraFilesFinder _decorated;
+        private readonly Report _report;
 
 
         internal CountingCameraFilesFinderDecorator(
-            [NotNull] ICameraFilesFinder decorated,
-            [NotNull] Report report)
+            ICameraFilesFinder decorated,
+            Report report)
         {
             _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
             _report = report ?? throw new ArgumentNullException(nameof(report));

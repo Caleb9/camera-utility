@@ -1,17 +1,16 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace CameraUtility.Reporting
 {
     internal sealed class CountingCameraFileCopierDecorator
         : ICameraFileCopier
     {
-        [NotNull] private readonly ICameraFileCopier _decorated;
-        [NotNull] private readonly Report _report;
+        private readonly ICameraFileCopier _decorated;
+        private readonly Report _report;
 
         public CountingCameraFileCopierDecorator(
-            [NotNull] ICameraFileCopier decorated,
-            [NotNull] Report report)
+            ICameraFileCopier decorated,
+            Report report)
         {
             _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
             _report = report ?? throw new ArgumentNullException(nameof(report));

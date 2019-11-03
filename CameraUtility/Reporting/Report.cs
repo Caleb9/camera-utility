@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace CameraUtility.Reporting
 {
@@ -13,7 +12,7 @@ namespace CameraUtility.Reporting
         /// <summary>
         ///     Accumulates list of errors for printing the final summary.
         /// </summary>
-        [NotNull] private readonly List<string> _errors = new List<string>();
+        private readonly List<string> _errors = new List<string>();
 
         /// <summary>
         ///     Files found per directory. Each execution of <see cref="ICameraFilesFinder.FindCameraFiles" /> will add
@@ -22,12 +21,12 @@ namespace CameraUtility.Reporting
         /// <remarks>
         ///     This is not thread safe. If this class is used concurrently, ConcurrentDictionary should be used.
         /// </remarks>
-        [NotNull] private readonly Dictionary<string, int> _filesFound = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _filesFound = new Dictionary<string, int>();
 
         /// <summary>
         ///     List of files that already exist in the destination.
         /// </summary>
-        [NotNull] private readonly HashSet<(string source, string destination)> _filesSkipped =
+        private readonly HashSet<(string source, string destination)> _filesSkipped =
             new HashSet<(string, string)>();
 
         private int FilesFound => _filesFound.Values.Sum();
@@ -36,7 +35,7 @@ namespace CameraUtility.Reporting
         private int FilesCopied { get; set; }
 
         internal void AddNumberOfFilesFoundIn(
-            [NotNull] string directory,
+            string directory,
             int numberOfFiles)
         {
             if (directory is null)
@@ -58,8 +57,8 @@ namespace CameraUtility.Reporting
         }
 
         internal void AddExceptionForFile(
-            [NotNull] string fileName,
-            [NotNull] Exception exception)
+            string fileName,
+            Exception exception)
         {
             if (fileName is null)
             {
@@ -75,8 +74,8 @@ namespace CameraUtility.Reporting
         }
 
         internal void AddSkippedFile(
-            [NotNull] string sourceFileName,
-            [NotNull] string destinationFileName)
+            string sourceFileName,
+            string destinationFileName)
         {
             if (string.IsNullOrWhiteSpace(sourceFileName))
             {

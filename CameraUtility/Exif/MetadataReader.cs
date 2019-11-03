@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using MetadataExtractor;
-using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace CameraUtility.Exif
 {
@@ -23,11 +22,10 @@ namespace CameraUtility.Exif
             /// <summary>
             ///     Currently used only by debugger.
             /// </summary>
-            [NotNull] 
             [SuppressMessage("ReSharper", "PrivateFieldCanBeConvertedToLocalVariable")]
             private readonly string _name;
 
-            public MetadataExtractorTagAdapter([NotNull] Tag metadataExtractorTag)
+            public MetadataExtractorTagAdapter(Tag metadataExtractorTag)
             {
                 if (metadataExtractorTag is null)
                 {
@@ -37,7 +35,7 @@ namespace CameraUtility.Exif
                 Directory = metadataExtractorTag.DirectoryName;
                 Value = metadataExtractorTag.Description ?? string.Empty;
                 Type = metadataExtractorTag.Type;
-                _name = metadataExtractorTag.Name ?? string.Empty;
+                _name = metadataExtractorTag.Name;
             }
 
             public string Directory { get; }

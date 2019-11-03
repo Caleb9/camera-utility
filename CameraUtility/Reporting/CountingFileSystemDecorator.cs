@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using CameraUtility.FileSystemIsolation;
-using JetBrains.Annotations;
 
 namespace CameraUtility.Reporting
 {
     internal sealed class CountingFileSystemDecorator
         : IFileSystem
     {
-        [NotNull] private readonly IFileSystem _decorated;
-        [NotNull] private readonly Report _report;
+        private readonly IFileSystem _decorated;
+        private readonly Report _report;
 
         public CountingFileSystemDecorator(
-            [NotNull] IFileSystem decorated,
+            IFileSystem decorated,
             Report report)
         {
             _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));

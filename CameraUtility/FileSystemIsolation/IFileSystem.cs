@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace CameraUtility.FileSystemIsolation
 {
@@ -18,11 +17,9 @@ namespace CameraUtility.FileSystemIsolation
         ///     of valid literal path and wildcard (* and ?) characters, but it does not support regular expressions.
         /// </param>
         /// <returns></returns>
-        [NotNull]
-        [ItemNotNull]
         IEnumerable<string> GetFiles(
-            [NotNull] string directory,
-            [NotNull] string searchMask = "*");
+            string directory,
+            string searchMask = "*");
 
         /// <summary>
         ///     Checks if directory exists and if not, creates it.
@@ -33,7 +30,7 @@ namespace CameraUtility.FileSystemIsolation
         /// </param>
         /// <returns>True if directory was created; false if it already exists.</returns>
         bool CreateDirectoryIfNotExists(
-            [NotNull] string path,
+            string path,
             bool pretend);
 
         /// <summary>
@@ -46,21 +43,20 @@ namespace CameraUtility.FileSystemIsolation
         /// </param>
         /// <returns>True if source file was copied to destination; false if it already exists.</returns>
         bool CopyFileIfDoesNotExist(
-            [NotNull] string source,
-            [NotNull] string destination,
+            string source,
+            string destination,
             bool pretend);
 
         /// <summary>
         ///     Concatenates paths with system-dependent path separator ('/' on Unix/Linux and '\' on Windows).
         /// </summary>
-        [NotNull]
         string CombinePaths(
-            [NotNull] [ItemNotNull] params string[] paths);
+            params string[] paths);
 
         /// <summary>
         ///     Checks if file or directory exists.
         /// </summary>
         bool Exists(
-            [NotNull] string path);
+            string path);
     }
 }

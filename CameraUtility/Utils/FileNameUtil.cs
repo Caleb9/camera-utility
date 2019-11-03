@@ -1,12 +1,10 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace CameraUtility.Utils
 {
     public static class FileNameUtil
     {
-        [NotNull]
-        public static string GetExtension([NotNull] string imagePath)
+        public static string GetExtension(string imagePath)
         {
             if (imagePath is null)
             {

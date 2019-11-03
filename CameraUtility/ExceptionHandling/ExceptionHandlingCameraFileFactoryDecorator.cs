@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using CameraUtility.CameraFiles;
 using CameraUtility.Exif;
-using JetBrains.Annotations;
 
 namespace CameraUtility.ExceptionHandling
 {
     internal sealed class ExceptionHandlingCameraFileFactoryDecorator
         : ICameraFileFactory
     {
-        [NotNull] private readonly ICameraFileFactory _decorated;
+        private readonly ICameraFileFactory _decorated;
 
         internal ExceptionHandlingCameraFileFactoryDecorator(
-            [NotNull] ICameraFileFactory decorated)
+            ICameraFileFactory decorated)
         {
             _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
         }

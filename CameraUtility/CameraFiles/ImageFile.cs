@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using CameraUtility.Exif;
-using JetBrains.Annotations;
 
 namespace CameraUtility.CameraFiles
 {
@@ -25,7 +24,7 @@ namespace CameraUtility.CameraFiles
 
         private const int SubSecondTagType = 0x9291;
 
-        public ImageFile([NotNull] string fullName, [NotNull] IEnumerable<ITag> exifTags)
+        public ImageFile(string fullName, IEnumerable<ITag> exifTags)
             : base(fullName)
         {
             if (exifTags is null)
@@ -43,9 +42,8 @@ namespace CameraUtility.CameraFiles
         public override DateTime Created { get; }
         public override string DestinationNamePrefix => "IMG_";
 
-        [NotNull]
         private ITag FindCreatedDateTimeTag(
-            [NotNull] IList<ITag> exifTags)
+            IList<ITag> exifTags)
         {
             return exifTags.FirstOrDefault(t => t.Type == DateTimeOriginalTagType)
                    /* Try fallback tag, if not found then an exception will be thrown */
@@ -53,7 +51,7 @@ namespace CameraUtility.CameraFiles
         }
 
         private DateTime ParseCreatedDateTime(
-            [NotNull] ITag dateTimeOriginal)
+            ITag dateTimeOriginal)
         {
             return DateTime.ParseExact(
                 dateTimeOriginal.Value,
@@ -62,7 +60,7 @@ namespace CameraUtility.CameraFiles
         }
 
         private int FindSubSeconds(
-            [NotNull] IEnumerable<ITag> exifTags)
+            IEnumerable<ITag> exifTags)
         {
             var subSeconds = exifTags.FirstOrDefault(t => t.Type == SubSecondTagType);
             return subSeconds is null ? 0 : ToMilliseconds(int.Parse(subSeconds.Value));

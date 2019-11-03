@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace CameraUtility.ExceptionHandling
 {
@@ -7,10 +6,10 @@ namespace CameraUtility.ExceptionHandling
         : ICameraFileCopier
     {
         private readonly bool _continueOnError;
-        [NotNull] private readonly ICameraFileCopier _decorated;
+        private readonly ICameraFileCopier _decorated;
 
         public ExceptionHandlingCameraFileCopierDecorator(
-            [NotNull] ICameraFileCopier decorated,
+            ICameraFileCopier decorated,
             bool continueOnError)
         {
             _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));

@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using JetBrains.Annotations;
 
 namespace CameraUtility
 {
@@ -23,8 +22,8 @@ namespace CameraUtility
         /// </param>
         /// <param name="cancellationToken"></param>
         void CopyCameraFiles(
-            [NotNull] string sourceDirectory,
-            [NotNull] string destinationDirectoryRoot,
+            string sourceDirectory,
+            string destinationDirectoryRoot,
             CancellationToken cancellationToken = default);
     }
 }

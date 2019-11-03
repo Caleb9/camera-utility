@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace CameraUtility.Exif
 {
@@ -11,6 +10,6 @@ namespace CameraUtility.Exif
         /// <summary>
         ///     Returns all tags found in file's Exif metadata.
         /// </summary>
-        IEnumerable<ITag> ExtractTags([NotNull] string filePath);
+        IEnumerable<ITag> ExtractTags(string filePath);
     }
 }

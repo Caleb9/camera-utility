@@ -2,21 +2,20 @@
 using CameraUtility.CameraFiles;
 using CameraUtility.Exif;
 using CameraUtility.FileSystemIsolation;
-using JetBrains.Annotations;
 
 namespace CameraUtility
 {
     public sealed class CameraFileNameConverter
         : ICameraFileNameConverter
     {
-        [NotNull] private readonly ICameraFileFactory _cameraFileFactory;
-        [NotNull] private readonly IFileSystem _fileSystem;
-        [NotNull] private readonly IMetadataReader _metadataReader;
+        private readonly ICameraFileFactory _cameraFileFactory;
+        private readonly IFileSystem _fileSystem;
+        private readonly IMetadataReader _metadataReader;
 
         public CameraFileNameConverter(
-            [NotNull] IMetadataReader metadataReader,
-            [NotNull] ICameraFileFactory cameraFileFactory,
-            [NotNull] IFileSystem fileSystem)
+            IMetadataReader metadataReader,
+            ICameraFileFactory cameraFileFactory,
+            IFileSystem fileSystem)
         {
             _metadataReader = metadataReader ?? throw new ArgumentNullException(nameof(metadataReader));
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
@@ -34,34 +33,30 @@ namespace CameraUtility
             return (destinationDirectory, destinationFileFullName);
         }
 
-        [NotNull]
         private ICameraFile GetCameraFile(
-            [NotNull] string cameraFilePath)
+            string cameraFilePath)
         {
             var metadataTags = _metadataReader.ExtractTags(cameraFilePath);
             return _cameraFileFactory.Create(cameraFilePath, metadataTags);
         }
 
-        [NotNull]
         private string GetDestinationDirectory(
-            [NotNull] string destinationRootPath,
-            [NotNull] ICameraFile cameraFile)
+            string destinationRootPath,
+            ICameraFile cameraFile)
         {
             var destinationSubDirectory = GetDateSubDirectoryName(cameraFile.Created);
             return _fileSystem.CombinePaths(destinationRootPath, destinationSubDirectory);
         }
 
-        [NotNull]
         private string GetDateSubDirectoryName(
             DateTime created)
         {
             return $"{created.Year:0000}_{created.Month:00}_{created.Day:00}";
         }
 
-        [NotNull]
         private string GetDestinationFileFullName(
-            [NotNull] string destinationDirectory, 
-            [NotNull] ICameraFile cameraFile)
+            string destinationDirectory, 
+            ICameraFile cameraFile)
         {
             var fileName = NewCameraFileName(cameraFile);
             var destinationFileFullName = _fileSystem.CombinePaths(destinationDirectory, fileName);
@@ -75,14 +70,12 @@ namespace CameraUtility
                    $"_{GetTimeForFileName(cameraFile.Created)}{cameraFile.Extension}";
         }
 
-        [NotNull]
         private string GetDateForFileName(
             DateTime created)
         {
             return $"{created.Year:0000}{created.Month:00}{created.Day:00}";
         }
 
-        [NotNull]
         private string GetTimeForFileName(
             DateTime created)
         {

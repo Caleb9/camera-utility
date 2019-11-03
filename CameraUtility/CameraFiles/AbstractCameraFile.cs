@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using CameraUtility.Utils;
-using JetBrains.Annotations;
 
 namespace CameraUtility.CameraFiles
 {
     [DebuggerDisplay("{FullName} {Created}")]
     public abstract class AbstractCameraFile : ICameraFile
     {
-        protected AbstractCameraFile([NotNull] string fullName)
+        protected AbstractCameraFile(string fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName))
             {

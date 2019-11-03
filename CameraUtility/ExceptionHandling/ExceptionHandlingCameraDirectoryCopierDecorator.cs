@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Threading;
-using JetBrains.Annotations;
 
 namespace CameraUtility.ExceptionHandling
 {
     internal sealed class ExceptionHandlingCameraDirectoryCopierDecorator
         : ICameraDirectoryCopier
     {
-        [NotNull] private readonly ICameraDirectoryCopier _decorated;
+        private readonly ICameraDirectoryCopier _decorated;
 
         internal ExceptionHandlingCameraDirectoryCopierDecorator(
-            [NotNull] ICameraDirectoryCopier decorated)
+            ICameraDirectoryCopier decorated)
         {
             _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
         }

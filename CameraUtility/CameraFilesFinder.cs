@@ -4,13 +4,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using CameraUtility.FileSystemIsolation;
-using JetBrains.Annotations;
 
 namespace CameraUtility
 {
     internal sealed class CameraFilesFinder : ICameraFilesFinder
     {
-        [NotNull]
         private static readonly string[] CameraFileExtensions =
         {
             ".jpg",
@@ -19,26 +17,24 @@ namespace CameraUtility
             ".mp4"
         };
 
-        [NotNull] private readonly IFileSystem _fileSystem;
+        private readonly IFileSystem _fileSystem;
 
         internal CameraFilesFinder(
-            [NotNull] IFileSystem fileSystem)
+            IFileSystem fileSystem)
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         }
 
-        [NotNull]
-        [ItemNotNull]
+
         IEnumerable<string> ICameraFilesFinder.FindCameraFiles(
-            [NotNull] string directory)
+            string directory)
         {
             return FindFilePaths(directory).Where(IsCameraFile).AsParallel();
         }
 
-        [NotNull]
-        [ItemNotNull]
+
         private IEnumerable<string> FindFilePaths(
-            [NotNull] string directory)
+            string directory)
         {
             try
             {
@@ -54,7 +50,7 @@ namespace CameraUtility
         }
 
         private bool IsCameraFile(
-            [NotNull] string filePath)
+            string filePath)
         {
             const bool ignoreCase = true;
             return CameraFileExtensions.Any(

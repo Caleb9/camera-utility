@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using CameraUtility.Exif;
-using JetBrains.Annotations;
 
 namespace CameraUtility.CameraFiles
 {
@@ -14,7 +13,7 @@ namespace CameraUtility.CameraFiles
     {
         private const int QuickTimeCreatedTag = 0x3;
 
-        public VideoFile([NotNull] string fullName, IEnumerable<ITag> exifTags)
+        public VideoFile(string fullName, IEnumerable<ITag> exifTags)
             : base(fullName)
         {
             var createdTag = 

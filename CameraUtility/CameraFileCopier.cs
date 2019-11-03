@@ -1,18 +1,17 @@
 ﻿using System.IO;
 using CameraUtility.FileSystemIsolation;
-using JetBrains.Annotations;
 
 namespace CameraUtility
 {
     public sealed class CameraFileCopier : ICameraFileCopier
     {
-        [NotNull] private readonly ICameraFileNameConverter _cameraFileNameConverter;
-        [NotNull] private readonly IFileSystem _fileSystem;
+        private readonly ICameraFileNameConverter _cameraFileNameConverter;
+        private readonly IFileSystem _fileSystem;
         private readonly bool _pretend;
 
         public CameraFileCopier(
-            [NotNull] ICameraFileNameConverter cameraFileNameConverter,
-            [NotNull] IFileSystem fileSystem,
+            ICameraFileNameConverter cameraFileNameConverter,
+            IFileSystem fileSystem,
             bool pretend)
         {
             _cameraFileNameConverter = cameraFileNameConverter;
@@ -25,8 +24,7 @@ namespace CameraUtility
         ///     generated (useful in tests), but <see cref="Program" /> sets it to System.IO.Console.Out so output is
         ///     printed to the console.
         /// </summary>
-        [CanBeNull]
-        internal TextWriter Console { private get; set; } = TextWriter.Null;
+        internal TextWriter? Console { private get; set; } = TextWriter.Null;
 
         void ICameraFileCopier.ExecuteCopyFile(
             string cameraFilePath,

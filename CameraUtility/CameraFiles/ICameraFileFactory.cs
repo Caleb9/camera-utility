@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using CameraUtility.Exif;
-using JetBrains.Annotations;
 
 namespace CameraUtility.CameraFiles
 {
@@ -12,9 +11,8 @@ namespace CameraUtility.CameraFiles
         /// <summary>
         ///     Creates new <see cref="ICameraFile"/> implementation based on file's extension.
         /// </summary>
-        [NotNull]
         ICameraFile Create(
-            [NotNull] string filePath,
-            [NotNull] [ItemNotNull] IEnumerable<ITag> metadata);
+            string filePath,
+            IEnumerable<ITag> metadata);
     }
 }

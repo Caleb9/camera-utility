@@ -1,11 +1,9 @@
-﻿using JetBrains.Annotations;
-
-namespace CameraUtility
+﻿namespace CameraUtility
 {
     public interface ICameraFileCopier
     {
         void ExecuteCopyFile(
-            [NotNull] string cameraFilePath,
-            [NotNull] string destinationDirectoryRoot);
+            string cameraFilePath,
+            string destinationDirectoryRoot);
     }
 }

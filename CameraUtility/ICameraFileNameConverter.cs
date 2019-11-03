@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-
-namespace CameraUtility
+﻿namespace CameraUtility
 {
     /// <summary>
     ///     Generates new name for a file, based on its type (image or video) and creation date (extracted from Exif
@@ -13,7 +11,7 @@ namespace CameraUtility
         ///     path).
         /// </summary>
         (string destinationDirectory, string destinationFileFullName) Convert(
-            [NotNull] string cameraFilePath,
-            [NotNull] string destinationRootPath);
+            string cameraFilePath,
+            string destinationRootPath);
     }
 }

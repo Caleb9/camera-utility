@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using CameraUtility.Exif;
-using JetBrains.Annotations;
 
 namespace CameraUtility.CameraFiles
 {
@@ -18,8 +17,8 @@ namespace CameraUtility.CameraFiles
         private const int DateTimeOriginalTagType = 0x9003;
 
         internal DngImageFile(
-            [NotNull] string fullName,
-            [NotNull] IEnumerable<ITag> exifTags)
+            string fullName,
+            IEnumerable<ITag> exifTags)
             : base(fullName)
         {
             if (exifTags is null)

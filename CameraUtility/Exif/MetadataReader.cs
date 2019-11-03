@@ -14,7 +14,6 @@ namespace CameraUtility.Exif
         {
             return ImageMetadataReader.ReadMetadata(filePath)
                 .SelectMany(tagDirectory => tagDirectory.Tags)
-                .Where(tag => !(tag is null))
                 .Select(tag => new MetadataExtractorTagAdapter(tag));
         }
 
@@ -35,7 +34,7 @@ namespace CameraUtility.Exif
                     throw new ArgumentNullException(nameof(metadataExtractorTag));
                 }
 
-                Directory = metadataExtractorTag.DirectoryName ?? string.Empty;
+                Directory = metadataExtractorTag.DirectoryName;
                 Value = metadataExtractorTag.Description ?? string.Empty;
                 Type = metadataExtractorTag.Type;
                 _name = metadataExtractorTag.Name ?? string.Empty;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using CameraUtility.CameraFiles;
 using CameraUtility.ExceptionHandling;
@@ -18,7 +19,9 @@ namespace CameraUtility
         private readonly Options _options;
         private readonly Report _report;
 
-        private Program(
+        /* AutoFixture uses this constructor implicitly. It should not be made private. */
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        public Program(
             Options options,
             IFileSystem fileSystem,
             IMetadataReader metadataReader,

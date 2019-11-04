@@ -63,7 +63,7 @@ Currently camera-util finds files of following types:
 ## How to Use
 
 You need [.NET Core Runtime](https://dotnet.microsoft.com/download)
-2.2 to run the application.
+3.0 to run the application.
 
 These are the command line options:
 ```

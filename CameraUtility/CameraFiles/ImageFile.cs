@@ -27,11 +27,6 @@ namespace CameraUtility.CameraFiles
         public ImageFile(string fullName, IEnumerable<ITag> exifTags)
             : base(fullName)
         {
-            if (exifTags is null)
-            {
-                throw new ArgumentNullException(nameof(exifTags));
-            }
-
             var enumeratedExifTags = exifTags.ToList();
             var dateTimeOriginal = FindCreatedDateTimeTag(enumeratedExifTags);
             Created =

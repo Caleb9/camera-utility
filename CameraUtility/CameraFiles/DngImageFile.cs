@@ -21,11 +21,6 @@ namespace CameraUtility.CameraFiles
             IEnumerable<ITag> exifTags)
             : base(fullName)
         {
-            if (exifTags is null)
-            {
-                throw new ArgumentNullException(nameof(exifTags));
-            }
-
             var dateTimeOriginal = exifTags.First(t => t.Type == DateTimeOriginalTagType);
             Created = DateTime.ParseExact(
                 dateTimeOriginal.Value,

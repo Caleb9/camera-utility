@@ -43,6 +43,8 @@ dotnet_csproj:
   file_version: $(GitVersion_AssemblySemFileVer)
   informational_version: $(GitVersion_InformationalVersion)
 
+configuration: Release
+
 build:
   verbosity: minimal
   project: CameraUtility.sln

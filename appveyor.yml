@@ -67,4 +67,4 @@ after_test:
 artifacts:
   # Zip and push console application to Artifacts
   - path: $(CameraUtility_PublishDirectory)
-    name: $(CameraUtility_ConsoleAppName)
+    name: $(CameraUtility_ConsoleAppName)-$(GitVersion_SemVer)

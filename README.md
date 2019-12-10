@@ -63,28 +63,27 @@ Currently camera-util finds files of following types:
 ## How to Use
 
 You need [.NET Core Runtime](https://dotnet.microsoft.com/download)
-3.0 to run the application.
+3.1 to run the application.
 
 These are the command line options:
 ```
+  -s, --src-dir       Required. Directory containing pictures and/or videos. All sub-directories will be searched
+                      too.
 
-  -s, --src-dir       Required. Directory containing pictures and/or videos. All
-                      sub-directories will be searched too.
+  -d, --dest-dir      Required. Destination directory root path where files will be copied into auto-created
+                      sub-directories named after file creation date (e.g. 2019_08_22/).
 
-  -d, --dest-dir      Required. Destination directory root path where files will
-                      be copied into auto-created sub-directories named after
-                      file creation date (e.g. 2019_08_22/).
+  -n, --dry-run       (Default: false) If present, no actual files will be copied. The output will contain
+                      information about source and destination paths.
 
-  -n, --dry-run       (Default: false) If present, no actual files will be
-                      copied. The output will contain information about source
-                      and destination paths.
+  -k, --keep-going    (Default: false) Try to continue operation when errors for individual files occur.
 
-  -k, --keep-going    (Default: false) Try to continue operation when errors for
-                      individual files occur.
+  -m, --move          (Default: false) Move files instead of just copying them.
 
   --help              Display this help screen.
 
   --version           Display version information.
+
 ```
 
 By default (if `--keep-going` is not used), the application will bail

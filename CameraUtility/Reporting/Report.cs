@@ -9,6 +9,8 @@ namespace CameraUtility.Reporting
     /// </summary>
     internal sealed class Report
     {
+        private readonly bool _filesAreMoved;
+
         /// <summary>
         ///     Accumulates list of errors for printing the final summary.
         /// </summary>
@@ -29,6 +31,16 @@ namespace CameraUtility.Reporting
         private readonly HashSet<(string source, string destination)> _filesSkipped =
             new HashSet<(string, string)>();
 
+        /// <summary>
+        ///     Changes the summary message to indicate if program is copying or moving files.
+        /// </summary>
+        /// <param name="filesAreMoved">True if files are to be moved; False if files are to be copied</param>
+        public Report(
+            bool filesAreMoved)
+        {
+            _filesAreMoved = filesAreMoved;
+        }
+        
         private int FilesFound => _filesFound.Values.Sum();
 
         private int FilesMetadataRead { get; set; }
@@ -142,11 +154,12 @@ namespace CameraUtility.Reporting
         private void PrintSummary()
         {
             Console.ForegroundColor = _errors.Any() ? ConsoleColor.Red : ConsoleColor.Green;
+            var copiedOrMoved = _filesAreMoved ? "Moved" : "Copied";
             Console.WriteLine(
                 $"Found {FilesFound} camera files. " +
                 $"Processed {FilesMetadataRead}. " +
                 $"Skipped {_filesSkipped.Count}. " +
-                $"Copied {FilesCopied}.");
+                $"{copiedOrMoved} {FilesCopied}.");
         }
     }
 }

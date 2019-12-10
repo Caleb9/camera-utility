@@ -38,7 +38,7 @@ namespace CameraUtility
             }
 
             /* Composition Root. Out of process resources can be swapped with fakes in tests. */
-            _report = new Report();
+            _report = new Report(options.RemoveFromSource);
             fileSystem = new CountingFileSystemDecorator(fileSystem, _report);
             _cameraDirectoryCopier =
                 new ExceptionHandlingCameraDirectoryCopierDecorator(
@@ -57,7 +57,8 @@ namespace CameraUtility
                                             new CameraFileFactory()),
                                         fileSystem),
                                     fileSystem,
-                                    options.DryRun)
+                                    options.DryRun,
+                                    options.RemoveFromSource)
                                 {
                                     Console = Console.Out
                                 },
@@ -147,12 +148,14 @@ namespace CameraUtility
                 string? sourceDirectory,
                 string? destinationDirectory,
                 bool dryRun,
-                bool tryContinueOnError)
+                bool tryContinueOnError,
+                bool removeFromSource)
             {
                 SourceDirectory = sourceDirectory;
                 DestinationDirectory = destinationDirectory;
                 DryRun = dryRun;
                 TryContinueOnError = tryContinueOnError;
+                RemoveFromSource = removeFromSource;
             }
 
             [Option('s', "src-dir", Required = true,
@@ -172,6 +175,10 @@ namespace CameraUtility
             [Option('k', "keep-going", Required = false, Default = false,
                 HelpText = "Try to continue operation when errors for individual files occur.")]
             public bool TryContinueOnError { get; }
+            
+            [Option('m', "move", Required = false, Default = false,
+                HelpText = "Move files instead of copying them.")]
+            public bool RemoveFromSource { get; }
         }
     }
 }

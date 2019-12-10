@@ -85,7 +85,13 @@ namespace CameraUtility.Tests
         {
             /* Arrange */
             var fixture = NewFixture();
-            fixture.Inject(new Program.Options("sourceDir", "destDir", false, false));
+            fixture.Inject(
+                new Program.Options(
+                    "sourceDir",
+                    "destDir",
+                    false,
+                    false,
+                    false));
             var fileSystemMock = fixture.Freeze<Mock<IFileSystem>>();
             SetupDefaultFakeFileSystem(fileSystemMock)
                 .Setup(fs => fs.GetFiles("sourceDir", "*"))

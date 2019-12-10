@@ -36,6 +36,27 @@ namespace CameraUtility.FileSystemIsolation
             string destination,
             bool pretend)
         {
+            var copied = CopyOrMove(source, destination, pretend, File.Copy);
+            Debug.WriteLineIf(!pretend && copied, $"Copied {source} -> {destination}");
+            return copied;
+        }
+
+        bool IFileSystem.MoveFileIfDoesNotExist(
+            string source,
+            string destination,
+            bool pretend)
+        {
+            var moved = CopyOrMove(source, destination, pretend, File.Move);
+            Debug.WriteLineIf(!pretend && moved, $"Moved {source} -> {destination}");
+            return moved;
+        }
+
+        private bool CopyOrMove(
+            string source,
+            string destination,
+            bool pretend,
+            Action<string, string, bool> copyOrMove)
+        {
             if (string.IsNullOrWhiteSpace(source))
             {
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(source));
@@ -53,12 +74,11 @@ namespace CameraUtility.FileSystemIsolation
             }
             if (!pretend)
             {
-                File.Copy(source, destination, false);
-                Debug.WriteLine($"Copied {source} -> {destination}");
+                copyOrMove(source, destination, false);
             }
             return true;
         }
-
+        
         IEnumerable<string> IFileSystem.GetFiles(
             string directory,
             string searchMask)

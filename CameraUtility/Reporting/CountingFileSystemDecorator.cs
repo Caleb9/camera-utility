@@ -15,7 +15,7 @@ namespace CameraUtility.Reporting
             Report report)
         {
             _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
-            _report = report;
+            _report = report ?? throw new ArgumentNullException(nameof(report));
         }
 
         IEnumerable<string> IFileSystem.GetFiles(string directory, string searchMask)
@@ -35,8 +35,28 @@ namespace CameraUtility.Reporting
             string destination,
             bool pretend)
         {
-            var result = _decorated.CopyFileIfDoesNotExist(source, destination, pretend);
-            if (result)
+            var copied = _decorated.CopyFileIfDoesNotExist(source, destination, pretend);
+            ProcessReport(copied, pretend, source, destination);
+            return copied;
+        }
+
+        bool IFileSystem.MoveFileIfDoesNotExist(
+            string source,
+            string destination,
+            bool pretend)
+        {
+            var moved = _decorated.MoveFileIfDoesNotExist(source, destination, pretend);
+            ProcessReport(moved, pretend, source, destination);
+            return moved;
+        }
+
+        private void ProcessReport(
+            bool copied,
+            bool pretend,
+            string source,
+            string destination)
+        {
+            if (copied)
             {
                 if (!pretend)
                 {
@@ -47,8 +67,6 @@ namespace CameraUtility.Reporting
             {
                 _report.AddSkippedFile(source, destination);
             }
-
-            return result;
         }
 
         string IFileSystem.CombinePaths(params string[] paths)

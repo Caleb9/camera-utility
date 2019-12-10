@@ -48,6 +48,20 @@ namespace CameraUtility.FileSystemIsolation
             bool pretend);
 
         /// <summary>
+        ///     Checks if destination file exists and if not, moves source to destination.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="pretend">
+        ///     If true, files will not be moved, but new names will be detected and printed out.
+        /// </param>
+        /// <returns>True if source file was moved to destination; false if it already exists.</returns>
+        bool MoveFileIfDoesNotExist(
+            string source,
+            string destination,
+            bool pretend);
+        
+        /// <summary>
         ///     Concatenates paths with system-dependent path separator ('/' on Unix/Linux and '\' on Windows).
         /// </summary>
         string CombinePaths(

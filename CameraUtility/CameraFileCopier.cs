@@ -8,15 +8,18 @@ namespace CameraUtility
         private readonly ICameraFileNameConverter _cameraFileNameConverter;
         private readonly IFileSystem _fileSystem;
         private readonly bool _pretend;
+        private readonly bool _removeFromSource;
 
         public CameraFileCopier(
             ICameraFileNameConverter cameraFileNameConverter,
             IFileSystem fileSystem,
-            bool pretend)
+            bool pretend,
+            bool removeFromSource)
         {
             _cameraFileNameConverter = cameraFileNameConverter;
             _fileSystem = fileSystem;
             _pretend = pretend;
+            _removeFromSource = removeFromSource;
         }
 
         /// <summary>

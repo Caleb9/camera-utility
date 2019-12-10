@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using CameraUtility.FileSystemIsolation;
 
 namespace CameraUtility
@@ -6,20 +7,20 @@ namespace CameraUtility
     public sealed class CameraFileCopier : ICameraFileCopier
     {
         private readonly ICameraFileNameConverter _cameraFileNameConverter;
+        private readonly CopyOrMoveMode _copyOrMoveMode;
         private readonly IFileSystem _fileSystem;
         private readonly bool _pretend;
-        private readonly bool _removeFromSource;
 
         public CameraFileCopier(
             ICameraFileNameConverter cameraFileNameConverter,
             IFileSystem fileSystem,
             bool pretend,
-            bool removeFromSource)
+            CopyOrMoveMode copyOrMoveMode)
         {
             _cameraFileNameConverter = cameraFileNameConverter;
             _fileSystem = fileSystem;
             _pretend = pretend;
-            _removeFromSource = removeFromSource;
+            _copyOrMoveMode = copyOrMoveMode;
         }
 
         /// <summary>
@@ -37,11 +38,16 @@ namespace CameraUtility
                 _cameraFileNameConverter.Convert(cameraFilePath, destinationDirectoryRoot);
 
             if (_fileSystem.CreateDirectoryIfNotExists(destinationPath, _pretend))
-            {
                 Console?.WriteLine($"Created {destinationPath}");
-            }
 
-            var copied = _fileSystem.CopyFileIfDoesNotExist(cameraFilePath, destinationFileFullName, _pretend);
+            var copied = _copyOrMoveMode switch
+            {
+                CopyOrMoveMode.Copy =>
+                _fileSystem.CopyFileIfDoesNotExist(cameraFilePath, destinationFileFullName, _pretend),
+                CopyOrMoveMode.Move =>
+                _fileSystem.MoveFileIfDoesNotExist(cameraFilePath, destinationFileFullName, _pretend),
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
             Console?.WriteLine(
                 copied

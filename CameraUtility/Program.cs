@@ -38,7 +38,8 @@ namespace CameraUtility
             }
 
             /* Composition Root. Out of process resources can be swapped with fakes in tests. */
-            _report = new Report(options.RemoveFromSource);
+            var copyOrMove = options.MoveMode ? CopyOrMoveMode.Move : CopyOrMoveMode.Copy;
+            _report = new Report(copyOrMove);
             fileSystem = new CountingFileSystemDecorator(fileSystem, _report);
             _cameraDirectoryCopier =
                 new ExceptionHandlingCameraDirectoryCopierDecorator(
@@ -58,7 +59,7 @@ namespace CameraUtility
                                         fileSystem),
                                     fileSystem,
                                     options.DryRun,
-                                    options.RemoveFromSource)
+                                    copyOrMove)
                                 {
                                     Console = Console.Out
                                 },
@@ -149,13 +150,13 @@ namespace CameraUtility
                 string? destinationDirectory,
                 bool dryRun,
                 bool tryContinueOnError,
-                bool removeFromSource)
+                bool moveMode)
             {
                 SourceDirectory = sourceDirectory;
                 DestinationDirectory = destinationDirectory;
                 DryRun = dryRun;
                 TryContinueOnError = tryContinueOnError;
-                RemoveFromSource = removeFromSource;
+                MoveMode = moveMode;
             }
 
             [Option('s', "src-dir", Required = true,
@@ -177,8 +178,8 @@ namespace CameraUtility
             public bool TryContinueOnError { get; }
             
             [Option('m', "move", Required = false, Default = false,
-                HelpText = "Move files instead of copying them.")]
-            public bool RemoveFromSource { get; }
+                HelpText = "Move files instead of just copying them.")]
+            public bool MoveMode { get; }
         }
     }
 }

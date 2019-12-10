@@ -9,7 +9,7 @@ namespace CameraUtility.Reporting
     /// </summary>
     internal sealed class Report
     {
-        private readonly bool _filesAreMoved;
+        private readonly CopyOrMoveMode _copyOrMoveMode;
 
         /// <summary>
         ///     Accumulates list of errors for printing the final summary.
@@ -34,11 +34,11 @@ namespace CameraUtility.Reporting
         /// <summary>
         ///     Changes the summary message to indicate if program is copying or moving files.
         /// </summary>
-        /// <param name="filesAreMoved">True if files are to be moved; False if files are to be copied</param>
+        /// <param name="copyOrMoveMode"></param>
         public Report(
-            bool filesAreMoved)
+            CopyOrMoveMode copyOrMoveMode)
         {
-            _filesAreMoved = filesAreMoved;
+            _copyOrMoveMode = copyOrMoveMode;
         }
         
         private int FilesFound => _filesFound.Values.Sum();
@@ -154,7 +154,12 @@ namespace CameraUtility.Reporting
         private void PrintSummary()
         {
             Console.ForegroundColor = _errors.Any() ? ConsoleColor.Red : ConsoleColor.Green;
-            var copiedOrMoved = _filesAreMoved ? "Moved" : "Copied";
+            var copiedOrMoved = _copyOrMoveMode switch
+            {
+                CopyOrMoveMode.Copy => "Copied",
+                CopyOrMoveMode.Move => "Moved",
+                _ => throw new ArgumentOutOfRangeException()
+            };
             Console.WriteLine(
                 $"Found {FilesFound} camera files. " +
                 $"Processed {FilesMetadataRead}. " +

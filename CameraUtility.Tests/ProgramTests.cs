@@ -78,10 +78,38 @@ namespace CameraUtility.Tests
         {
             fileSystemMock.Verify(fs => fs.CopyFileIfDoesNotExist(sourceFile, destinationFile, false), Times.Once);
         }
+        
+        private void AssertFileMoved(Mock<IFileSystem> fileSystemMock, string sourceFile, string destinationFile)
+        {
+            fileSystemMock.Verify(fs => fs.MoveFileIfDoesNotExist(sourceFile, destinationFile, false), Times.Once);
+        }
 
+        private Mock<IFileSystem> SetupFilesInFileSystem(IFixture fixture, string sourceDir)
+        {
+            var fileSystemMock = fixture.Freeze<Mock<IFileSystem>>();
+            SetupDefaultFakeFileSystem(fileSystemMock)
+                .Setup(fs => fs.GetFiles(sourceDir, "*"))
+                .Returns(new[] {
+                    $"{sourceDir}/IMG_1234.JPG",
+                    $"{sourceDir}/IMG_4231.JPG",
+                    $"{sourceDir}/IMG_1234.CR2",
+                    $"{sourceDir}/MVI_1234.MP4" });
+            fixture
+                .Freeze<Mock<IMetadataReader>>()
+                .SetupSequence(mr => mr.ExtractTags(It.IsAny<string>()))
+                .Returns(NewImageFileTags("2010:01:12 13:14:15", "42"))
+                .Returns(NewImageFileTags("2011:02:13 14:15:16", "43"))
+                .Returns(NewImageFileTags("2012:03:14 15:16:17", "44"))
+                .Returns(new[] { NewQuickTimeCreatedTag("Fri Jun 13 14.15.16 1980") });
+            return fileSystemMock;
+        }
+        
+        /// <summary>
+        ///     Basic sanity check for copy-mode.
+        /// </summary>
         [Test]
         [TestOf(nameof(Program.Execute))]
-        public void Execute_FourImageFiles_FilesGetCopied()
+        public void Execute__FourImageFiles_CopyMode__FilesGetCopied()
         {
             /* Arrange */
             var fixture = NewFixture();
@@ -92,21 +120,7 @@ namespace CameraUtility.Tests
                     false,
                     false,
                     false));
-            var fileSystemMock = fixture.Freeze<Mock<IFileSystem>>();
-            SetupDefaultFakeFileSystem(fileSystemMock)
-                .Setup(fs => fs.GetFiles("sourceDir", "*"))
-                .Returns(new[] {
-                    "sourceDir/IMG_1234.JPG",
-                    "sourceDir/IMG_4231.JPG",
-                    "sourceDir/IMG_1234.CR2",
-                    "sourceDir/MVI_1234.MP4" });
-            fixture
-                .Freeze<Mock<IMetadataReader>>()
-                .SetupSequence(mr => mr.ExtractTags(It.IsAny<string>()))
-                .Returns(NewImageFileTags("2010:01:12 13:14:15", "42"))
-                .Returns(NewImageFileTags("2011:02:13 14:15:16", "43"))
-                .Returns(NewImageFileTags("2012:03:14 15:16:17", "44"))
-                .Returns(new[] { NewQuickTimeCreatedTag("Fri Jun 13 14.15.16 1980") });
+            var fileSystemMock = SetupFilesInFileSystem(fixture, "sourceDir");
             var sut = fixture.Create<Program>();
 
             /* Act */
@@ -125,6 +139,78 @@ namespace CameraUtility.Tests
             AssertDirectoryCreated(fileSystemMock, "destDir/1980_06_13");
             AssertFileCopied(
                 fileSystemMock, "sourceDir/MVI_1234.MP4", "destDir/1980_06_13/VID_19800613_141516000.MP4");
+        }
+        
+        /// <summary>
+        ///     Basic sanity check for move-mode.
+        /// </summary>
+        [Test]
+        [TestOf(nameof(Program.Execute))]
+        public void Execute__FourImageFiles_MoveMode__FilesGetMoved()
+        {
+            /* Arrange */
+            var fixture = NewFixture();
+            fixture.Inject(
+                new Program.Options(
+                    "sourceDir",
+                    "destDir",
+                    false,
+                    false,
+                    true));
+            var fileSystemMock = SetupFilesInFileSystem(fixture, "sourceDir");
+            var sut = fixture.Create<Program>();
+
+            /* Act */
+            sut.Execute();
+
+            /* Assert */
+            AssertDirectoryCreated(fileSystemMock, "destDir/2010_01_12");
+            AssertFileMoved(
+                fileSystemMock, "sourceDir/IMG_1234.JPG", "destDir/2010_01_12/IMG_20100112_131415420.JPG");
+            AssertDirectoryCreated(fileSystemMock, "destDir/2011_02_13");
+            AssertFileMoved(
+                fileSystemMock, "sourceDir/IMG_4231.JPG", "destDir/2011_02_13/IMG_20110213_141516430.JPG");
+            AssertDirectoryCreated(fileSystemMock, "destDir/2012_03_14");
+            AssertFileMoved(
+                fileSystemMock, "sourceDir/IMG_1234.CR2", "destDir/2012_03_14/IMG_20120314_151617440.CR2");
+            AssertDirectoryCreated(fileSystemMock, "destDir/1980_06_13");
+            AssertFileMoved(
+                fileSystemMock, "sourceDir/MVI_1234.MP4", "destDir/1980_06_13/VID_19800613_141516000.MP4");
+        }
+        
+        /// <summary>
+        ///     Basic sanity check for dry-run-mode.
+        /// </summary>
+        [TestCase(true)]
+        [TestCase(false)]
+        [TestOf(nameof(Program.Execute))]
+        public void Execute__FourImageFiles_PretendMode__FilesGetMoved(bool moveMode)
+        {
+            /* Arrange */
+            var fixture = NewFixture();
+            fixture.Inject(
+                new Program.Options(
+                    "sourceDir",
+                    "destDir",
+                    true,
+                    false,
+                    moveMode));
+            var fileSystemMock = SetupFilesInFileSystem(fixture, "sourceDir");
+            var sut = fixture.Create<Program>();
+
+            /* Act */
+            sut.Execute();
+
+            /* Assert */
+            fileSystemMock.Verify(
+                fs => fs.CreateDirectoryIfNotExists(It.IsAny<string>(), false),
+                Times.Never);
+            fileSystemMock.Verify(
+                fs => fs.CopyFileIfDoesNotExist(It.IsAny<string>(), It.IsAny<string>(), false),
+                Times.Never);
+            fileSystemMock.Verify(
+                fs => fs.MoveFileIfDoesNotExist(It.IsAny<string>(), It.IsAny<string>(), false),
+                Times.Never);
         }
     }
 }

@@ -12,8 +12,8 @@ namespace CameraUtility.Reporting
             ICameraFileCopier decorated,
             Report report)
         {
-            _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
-            _report = report ?? throw new ArgumentNullException(nameof(report));
+            _decorated = decorated;
+            _report = report;
         }
 
         void ICameraFileCopier.ExecuteCopyFile(

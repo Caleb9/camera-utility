@@ -6,11 +6,6 @@ namespace CameraUtility.Utils
     {
         public static string GetExtension(string imagePath)
         {
-            if (imagePath is null)
-            {
-                throw new ArgumentNullException(nameof(imagePath));
-            }
-
             try
             {
                 return imagePath.Substring(imagePath.LastIndexOf('.'));

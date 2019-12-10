@@ -13,7 +13,7 @@ namespace CameraUtility.ExceptionHandling
         internal ExceptionHandlingCameraFileFactoryDecorator(
             ICameraFileFactory decorated)
         {
-            _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
+            _decorated = decorated;
         }
 
         ICameraFile ICameraFileFactory.Create(

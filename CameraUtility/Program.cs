@@ -27,16 +27,6 @@ namespace CameraUtility
             IMetadataReader metadataReader,
             CancellationTokenSource cancellationTokenSource)
         {
-            if (fileSystem is null)
-            {
-                throw new ArgumentNullException(nameof(fileSystem));
-            }
-
-            if (metadataReader is null)
-            {
-                throw new ArgumentNullException(nameof(metadataReader));
-            }
-
             /* Composition Root. Out of process resources can be swapped with fakes in tests. */
             var copyOrMove = options.MoveMode ? CopyOrMoveMode.Move : CopyOrMoveMode.Copy;
             _report = new Report(copyOrMove);
@@ -66,8 +56,7 @@ namespace CameraUtility
                                 _report),
                             options.TryContinueOnError
                         )));
-            _cancellationTokenSource = cancellationTokenSource ??
-                                       throw new ArgumentNullException(nameof(cancellationTokenSource));
+            _cancellationTokenSource = cancellationTokenSource;
             _options = options;
         }
 

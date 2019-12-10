@@ -11,7 +11,7 @@ namespace CameraUtility.ExceptionHandling
         internal ExceptionHandlingCameraDirectoryCopierDecorator(
             ICameraDirectoryCopier decorated)
         {
-            _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
+            _decorated = decorated;
         }
 
         void ICameraDirectoryCopier.CopyCameraFiles(

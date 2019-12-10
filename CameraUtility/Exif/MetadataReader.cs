@@ -27,11 +27,6 @@ namespace CameraUtility.Exif
 
             public MetadataExtractorTagAdapter(Tag metadataExtractorTag)
             {
-                if (metadataExtractorTag is null)
-                {
-                    throw new ArgumentNullException(nameof(metadataExtractorTag));
-                }
-
                 Directory = metadataExtractorTag.DirectoryName;
                 Value = metadataExtractorTag.Description ?? string.Empty;
                 Type = metadataExtractorTag.Type;

@@ -22,7 +22,7 @@ namespace CameraUtility
         internal CameraFilesFinder(
             IFileSystem fileSystem)
         {
-            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            _fileSystem = fileSystem;
         }
 
 

@@ -13,7 +13,7 @@ namespace CameraUtility.ExceptionHandling
         internal ExceptionHandlingMetadataReaderDecorator(
             IMetadataReader decorated)
         {
-            _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
+            _decorated = decorated;
         }
 
         IEnumerable<ITag> IMetadataReader.ExtractTags(string filePath)

@@ -17,9 +17,8 @@ namespace CameraUtility
             ICameraFilesFinder cameraFilesFinder,
             ICameraFileCopier cameraFileCopier)
         {
-            _cameraFilesFinder = cameraFilesFinder ?? throw new ArgumentNullException(nameof(cameraFilesFinder));
-            _cameraFileCopier =
-                cameraFileCopier ?? throw new ArgumentNullException(nameof(cameraFileCopier));
+            _cameraFilesFinder = cameraFilesFinder;
+            _cameraFileCopier = cameraFileCopier;
         }
 
         void ICameraDirectoryCopier.CopyCameraFiles(

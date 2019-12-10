@@ -17,8 +17,8 @@ namespace CameraUtility
             ICameraFileFactory cameraFileFactory,
             IFileSystem fileSystem)
         {
-            _metadataReader = metadataReader ?? throw new ArgumentNullException(nameof(metadataReader));
-            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            _metadataReader = metadataReader;
+            _fileSystem = fileSystem;
             _cameraFileFactory = cameraFileFactory;
         }
 

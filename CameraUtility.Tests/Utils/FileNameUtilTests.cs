@@ -26,16 +26,5 @@ namespace CameraUtility.Tests.Utils
             /* Assert */
             Assert.AreEqual(expected, result);
         }
-
-        [Test]
-        [TestOf(nameof(FileNameUtil.GetExtension))]
-        public void GetExtension_InputNull_Throws()
-        {
-            /* Act */
-            void TestDelegate() => FileNameUtil.GetExtension(null!);
-
-            /* Assert */
-            Assert.Throws<ArgumentNullException>(TestDelegate);
-        }
     }
 }

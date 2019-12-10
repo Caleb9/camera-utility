@@ -12,7 +12,7 @@ namespace CameraUtility.ExceptionHandling
             ICameraFileCopier decorated,
             bool continueOnError)
         {
-            _decorated = decorated ?? throw new ArgumentNullException(nameof(decorated));
+            _decorated = decorated;
             _continueOnError = continueOnError;
         }
 

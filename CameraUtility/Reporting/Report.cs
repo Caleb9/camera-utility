@@ -50,11 +50,6 @@ namespace CameraUtility.Reporting
             string directory,
             int numberOfFiles)
         {
-            if (directory is null)
-            {
-                throw new ArgumentNullException(nameof(directory));
-            }
-
             _filesFound.Add(directory, numberOfFiles);
         }
 
@@ -72,16 +67,6 @@ namespace CameraUtility.Reporting
             string fileName,
             Exception exception)
         {
-            if (fileName is null)
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
-
-            if (exception is null)
-            {
-                throw new ArgumentNullException(nameof(exception));
-            }
-
             _errors.Add($"{fileName}: {exception.Message}");
         }
 

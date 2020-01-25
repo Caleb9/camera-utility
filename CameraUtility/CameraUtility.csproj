@@ -42,8 +42,8 @@
 
   <ItemGroup>
     <!-- NuGet packages -->
-    <PackageReference Include="CommandLineParser" Version="2.6.0" />
-    <PackageReference Include="MetadataExtractor" Version="2.2.0" />
+    <PackageReference Include="CommandLineParser" Version="2.7.82" />
+    <PackageReference Include="MetadataExtractor" Version="2.3.0" />
   </ItemGroup>
 
 </Project>

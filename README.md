@@ -3,6 +3,9 @@
 Command line tool to copy photos and videos (e.g. from SD card) and
 rename them by date.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/bjyr7h0qwtcx1kby/branch/master?svg=true)](https://ci.appveyor.com/project/Caleb9/camera-utility/branch/master)
+
+
 ## Why?
 
 I've been downloading photos from my Canon EOS (DSLR) camera using EOS
@@ -52,6 +55,7 @@ milliseconds also in the time portion of the name. This is to support
 DSLR's High-Speed Shooting mode, where more than one photo per second
 is taken.
 
+
 ## Supported File Types
 
 Currently camera-util finds files of following types:
@@ -60,10 +64,8 @@ Currently camera-util finds files of following types:
 * DNG (Android's raw format)
 * MP4 (Video)
 
-## How to Use
 
-You need [.NET Core Runtime](https://dotnet.microsoft.com/download)
-3.1 to run the application.
+## How to Use
 
 These are the command line options:
 ```
@@ -102,11 +104,5 @@ on both Windows and Linux.
 
 ## Things to Do
 
-* It would be great to set up AppVeyor to produce distribuable
-  binaries. Problem is the current .NET Core publish mode where either
-  you get only assemblies and need to have .NET Core Runtime installed
-  on the machine, or you package the whole Runtime along and produce
-  platform-specific package. The latter weights overall around 70 MB
-  which is ridiculous for this type of application.
 * Force-overwrite mode.
 * List of individual files as input.

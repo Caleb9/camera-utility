@@ -1,37 +1,26 @@
-﻿version: build-{build}
-image: Visual Studio 2019
+﻿version: '{build}'
+image: Ubuntu
 
 init:
   # Good practice, because Windows line endings are different from Unix/Linux ones
   - git config --global core.autocrlf true
 
 install:
-  # Visual Studio 2019 image does not have GitVersion installed
-  # Also, it seems version 5.0.0 and newer don't work for some reason
-  - choco install gitversion.portable -y --version 4.0.0
+  - dotnet tool install --global --version 5.1.3 gitversion.tool
 
 before_build:
   # Display versions of used tools
   - git --version
   - dotnet --version
-  - gitversion /version
+  - dotnet-gitversion /version
 
   # Calculate semantic version and set environment variables
   - echo *** Calculating semantic version ***
-  - gitversion /verbosity warn /l console /output buildserver /nofetch /b %APPVEYOR_REPO_BRANCH%
+  - dotnet-gitversion /verbosity warn /l console /output buildserver /nofetch /b $APPVEYOR_REPO_BRANCH
 
   # Needed to report test results from .NET Core projects to AppVeyor.
   - echo *** Installing Appveyor.TestLogger into test projects ***
-  - ps: |
-      Get-ChildItem .\**\*.csproj -Recurse |
-        Where-Object { $_.Name -match ".*Test(s)?.csproj$"} |
-        ForEach-Object {
-          & dotnet add $_.FullName package --no-restore Appveyor.TestLogger
-        }
-
-  # Display minimal restore text
-  - echo *** Restoring NuGet packages ***
-  - dotnet restore --verbosity m
+  - find -regex '.*\.Tests?\.csproj' -exec dotnet add {} package --no-restore Appveyor.TestLogger \;
 
 # Patching .NET Core .csproj files (we don't have AssemblyInfo.cs)
 dotnet_csproj:
@@ -43,30 +32,48 @@ dotnet_csproj:
   file_version: $(GitVersion_AssemblySemFileVer)
   informational_version: $(GitVersion_InformationalVersion)
 
+environment:
+  # Create separate build jobs for Linux and Windows artifacts
+  matrix:
+    - CameraUtility_runtime: linux-x64
+    - CameraUtility_runtime: win-x64
+  # Custom environment variables used to publish artifacts. Note that this is executed BEFORE GitVersion
+  # emits its variables, so it's not possible to use these variables in values here.
+  CameraUtility_ConsoleAppProject: CameraUtility
+  CameraUtility_ConsoleAppName: camera-utility
+  CameraUtility_PublishFolder: publish/$CameraUtility_runtime
+
+# Immediately fail entire build if one of the jobs fails
+matrix:
+  fast_finish: true
+
 configuration: Release
 
-build:
-  verbosity: minimal
-  project: CameraUtility.sln
+build_script:
+  - dotnet build --verbosity m --configuration $CONFIGURATION --runtime $CameraUtility_runtime
 
 test_script:
-  - echo *** Executing tests ***
-  - ps: |
-      dotnet test --verbosity m --no-build --logger:AppVeyor;
-      if ($LastExitCode -ne 0) { throw "Failed tests" };
-
-# Custom environment variables used to publish artifacts
-environment:
-  CameraUtility_ConsoleAppName: CameraUtility
-  CameraUtility_PublishDirectory: publish
+  - dotnet test --verbosity m --configuration $CONFIGURATION --no-build
+    --runtime $CameraUtility_runtime --logger:AppVeyor;
 
 after_test:
-  - echo *** Preparing artifacts ***
-  # Output console application binaries to 'publish' folder
-  - 'dotnet publish --verbosity m --no-build
-    --output %APPVEYOR_BUILD_FOLDER%\%CameraUtility_PublishDirectory% %CameraUtility_ConsoleAppName%'
+  - dotnet publish --verbosity m --configuration $CONFIGURATION --no-build
+    --runtime $CameraUtility_runtime --output $CameraUtility_PublishFolder
+    $CameraUtility_ConsoleAppProject
+    /p:PublishSingleFile=true /p:PublishTrimmed=true /p:DebugType=None
+  - 7z a $CameraUtility_ConsoleAppName-$GitVersion_FullSemVer-$CameraUtility_runtime.zip
+    $APPVEYOR_BUILD_FOLDER/$CameraUtility_PublishFolder/* $APPVEYOR_BUILD_FOLDER/LICENSE.txt
 
 artifacts:
-  # Zip and push console application to Artifacts
-  - path: $(CameraUtility_PublishDirectory)
-    name: $(CameraUtility_ConsoleAppName)-$(GitVersion_FullSemVer)
+  - path: $(CameraUtility_ConsoleAppName)-$(GitVersion_FullSemVer)-$(CameraUtility_runtime).zip
+
+deploy:
+  release: $(GitVersion_FullSemVer)
+  description: ''
+  provider: GitHub
+  auth_token:
+    secure: /YPgr1Fez43MdWKzvzO10XbOLKPQ6gTeYj0L5QG/ZNb1P7utd529LhWGfTKpQb9p
+  draft: true
+  prerelease: false
+  on:
+    APPVEYOR_REPO_TAG: true

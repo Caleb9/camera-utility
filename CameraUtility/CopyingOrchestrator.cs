@@ -7,13 +7,13 @@ namespace CameraUtility
     ///     Orchestrator for finding images and videos in source directory, and copying them to destination directory
     ///     (with changed name).
     /// </summary>
-    public sealed class CameraDirectoryCopier
+    public sealed class CopyingOrchestrator
         : ICameraDirectoryCopier
     {
         private readonly ICameraFilesFinder _cameraFilesFinder;
         private readonly ICameraFileCopier _cameraFileCopier;
 
-        public CameraDirectoryCopier(
+        public CopyingOrchestrator(
             ICameraFilesFinder cameraFilesFinder,
             ICameraFileCopier cameraFileCopier)
         {
@@ -22,11 +22,11 @@ namespace CameraUtility
         }
 
         void ICameraDirectoryCopier.CopyCameraFiles(
-            string sourceDirectory,
+            string sourcePath,
             string destinationDirectoryRoot,
             CancellationToken cancellationToken)
         {
-            foreach (var cameraFilePath in _cameraFilesFinder.FindCameraFiles(sourceDirectory))
+            foreach (var cameraFilePath in _cameraFilesFinder.FindCameraFiles(sourcePath))
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 _cameraFileCopier.ExecuteCopyFile(cameraFilePath, destinationDirectoryRoot);

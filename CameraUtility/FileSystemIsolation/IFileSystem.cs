@@ -72,5 +72,11 @@ namespace CameraUtility.FileSystemIsolation
         /// </summary>
         bool Exists(
             string path);
+
+        /// <summary>
+        ///     Checks if path denotes a directory. 
+        /// </summary>
+        bool IsDirectory(
+            string path);
     }
 }

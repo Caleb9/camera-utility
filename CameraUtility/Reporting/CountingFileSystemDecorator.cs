@@ -78,5 +78,10 @@ namespace CameraUtility.Reporting
         {
             return _decorated.Exists(path);
         }
+
+        bool IFileSystem.IsDirectory(string path)
+        {
+            return _decorated.IsDirectory(path);
+        }
     }
 }

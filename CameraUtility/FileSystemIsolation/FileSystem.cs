@@ -109,5 +109,10 @@ namespace CameraUtility.FileSystemIsolation
         {
             return File.Exists(path) || Directory.Exists(path);
         }
+
+        bool IFileSystem.IsDirectory(string path)
+        {
+            return File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+        }
     }
 }

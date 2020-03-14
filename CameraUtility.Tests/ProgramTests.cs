@@ -87,6 +87,12 @@ namespace CameraUtility.Tests
         private Mock<IFileSystem> SetupFilesInFileSystem(IFixture fixture, string sourceDir)
         {
             var fileSystemMock = fixture.Freeze<Mock<IFileSystem>>();
+            fileSystemMock
+                .Setup(fs => fs.Exists($"{sourceDir}"))
+                .Returns(true);
+            fileSystemMock
+                .Setup(fs => fs.IsDirectory(It.IsAny<string>()))
+                .Returns(true);
             SetupDefaultFakeFileSystem(fileSystemMock)
                 .Setup(fs => fs.GetFiles(sourceDir, "*"))
                 .Returns(new[] {

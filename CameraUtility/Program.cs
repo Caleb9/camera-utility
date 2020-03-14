@@ -33,7 +33,7 @@ namespace CameraUtility
             fileSystem = new CountingFileSystemDecorator(fileSystem, _report);
             _cameraDirectoryCopier =
                 new ExceptionHandlingCameraDirectoryCopierDecorator(
-                    new CameraDirectoryCopier(
+                    new CopyingOrchestrator(
                         new CountingCameraFilesFinderDecorator(
                             new CameraFilesFinder(
                                 fileSystem),
@@ -104,11 +104,11 @@ namespace CameraUtility
 
         public void Execute()
         {
-            Debug.Assert(_options.SourceDirectory != null, "_options.SourceDirectory != null");
+            Debug.Assert(_options.SourcePath != null, "_options.SourceDirectory != null");
             Debug.Assert(_options.DestinationDirectory != null, "_options.DestinationDirectory != null");
             
             _cameraDirectoryCopier.CopyCameraFiles(
-                _options.SourceDirectory,
+                _options.SourcePath,
                 _options.DestinationDirectory,
                 _cancellationTokenSource.Token);
         }
@@ -135,22 +135,23 @@ namespace CameraUtility
         public sealed class Options
         {
             public Options(
-                string? sourceDirectory,
+                string? sourcePath,
                 string? destinationDirectory,
                 bool dryRun,
                 bool tryContinueOnError,
                 bool moveMode)
             {
-                SourceDirectory = sourceDirectory;
+                SourcePath = sourcePath;
                 DestinationDirectory = destinationDirectory;
                 DryRun = dryRun;
                 TryContinueOnError = tryContinueOnError;
                 MoveMode = moveMode;
             }
 
-            [Option('s', "src-dir", Required = true,
-                HelpText = "Directory containing pictures and/or videos. All sub-directories will be searched too.")]
-            public string? SourceDirectory { get; }
+            [Option('s', "src-path", Required = true,
+                HelpText = "Path to a camera file (image or video) or a directory containing camera files. " +
+                           "All sub-directories will be scanned as well.")]
+            public string? SourcePath { get; }
 
             [Option('d', "dest-dir", Required = true,
                 HelpText = "Destination directory root path where files will be copied into auto-created" +

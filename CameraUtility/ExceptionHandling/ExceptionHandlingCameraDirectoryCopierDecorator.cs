@@ -15,13 +15,13 @@ namespace CameraUtility.ExceptionHandling
         }
 
         void ICameraDirectoryCopier.CopyCameraFiles(
-            string sourceDirectory,
+            string sourcePath,
             string destinationDirectoryRoot,
             CancellationToken cancellationToken)
         {
             try
             {
-                _decorated.CopyCameraFiles(sourceDirectory, destinationDirectoryRoot, cancellationToken);
+                _decorated.CopyCameraFiles(sourcePath, destinationDirectoryRoot, cancellationToken);
             }
             catch (Exception exception) when (!(exception is OperationCanceledException))
             {

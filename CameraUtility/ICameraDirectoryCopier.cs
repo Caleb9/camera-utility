@@ -13,7 +13,7 @@ namespace CameraUtility
         ///     portion of the name contains milliseconds to support photos taken with high-speed continuous shooting,
         ///     where more than one picture per second is taken.
         /// </summary>
-        /// <param name="sourceDirectory">
+        /// <param name="sourcePath">
         ///     Directory containing image and video files to be copied.
         /// </param>
         /// <param name="destinationDirectoryRoot">
@@ -22,7 +22,7 @@ namespace CameraUtility
         /// </param>
         /// <param name="cancellationToken"></param>
         void CopyCameraFiles(
-            string sourceDirectory,
+            string sourcePath,
             string destinationDirectoryRoot,
             CancellationToken cancellationToken = default);
     }

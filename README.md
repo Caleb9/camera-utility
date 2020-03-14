@@ -69,8 +69,8 @@ Currently camera-util finds files of following types:
 
 These are the command line options:
 ```
-  -s, --src-dir       Required. Directory containing pictures and/or videos. All sub-directories will be searched
-                      too.
+  -s, --src-path      Required. Path to a camera file (image or video) or a directory containing camera files. All
+                      sub-directories will be scanned as well.
 
   -d, --dest-dir      Required. Destination directory root path where files will be copied into auto-created
                       sub-directories named after file creation date (e.g. 2019_08_22/).

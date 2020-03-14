@@ -22,10 +22,10 @@ namespace CameraUtility.Reporting
         
 
         IEnumerable<string> ICameraFilesFinder.FindCameraFiles(
-            string directory)
+            string path)
         {
-            var result = _decorated.FindCameraFiles(directory).ToList();
-            _report.AddNumberOfFilesFoundIn(directory, result.Count);
+            var result = _decorated.FindCameraFiles(path).ToList();
+            _report.AddNumberOfFilesFoundIn(path, result.Count);
             return result;
         }
     }

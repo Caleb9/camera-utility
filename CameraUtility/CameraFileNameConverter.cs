@@ -22,6 +22,8 @@ namespace CameraUtility
             _cameraFileFactory = cameraFileFactory;
         }
 
+        public bool SkipDateSubDirectory { get; set; } = false;
+
         (string destinationDirectory, string destinationFileFullName) ICameraFileNameConverter.Convert(
             string cameraFilePath,
             string destinationRootPath)
@@ -44,6 +46,10 @@ namespace CameraUtility
             string destinationRootPath,
             ICameraFile cameraFile)
         {
+            if (SkipDateSubDirectory)
+            {
+                return destinationRootPath;
+            }
             var destinationSubDirectory = GetDateSubDirectoryName(cameraFile.Created);
             return _fileSystem.CombinePaths(destinationRootPath, destinationSubDirectory);
         }

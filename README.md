@@ -38,8 +38,9 @@ where each photo has the creation date in its name.
 
 This small program does just that. It finds all the photos and videos
 in the input directory, reads the creation date from EXIF metadata,
-and copies the file into a sub-directory derived from the date, also
-renaming it so that the name is also derived from the creation date.
+and copies the file into a sub-directory derived from the date (this
+can be optionally disabled), renaming it so that the name is also
+derived from the creation date.
 
 In the output directory result looks something like this:
 
@@ -81,6 +82,8 @@ These are the command line options:
   -k, --keep-going    (Default: false) Try to continue operation when errors for individual files occur.
 
   -m, --move          (Default: false) Move files instead of just copying them.
+
+  --skip-date-subdir  (Default: false) Do not create date sub-directories in destination directory.
 
   --help              Display this help screen.
 

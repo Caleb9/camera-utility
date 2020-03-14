@@ -35,11 +35,31 @@ namespace CameraUtility.Tests
                 .Freeze<Mock<ICameraFileFactory>>()
                 .Setup(f => f.Create(It.IsAny<string>(), It.IsAny<IEnumerable<ITag>>()))
                 .Returns(Mock.Of<ICameraFile>(f => f.Created == new DateTime(2019, 08, 25)));
-            ICameraFileNameConverter sut = fixture.Create<CameraFileNameConverter>();
+            var cameraFileNameConverter = fixture.Create<CameraFileNameConverter>();
+            cameraFileNameConverter.SkipDateSubDirectory = false;
+            ICameraFileNameConverter sut = cameraFileNameConverter;
 
             var (result, _) = sut.Convert("sourceDir/IMG_1234.jpg", "destDir");
 
             Assert.AreEqual("destDir/2019_08_25", result);
+        }
+        
+        [Test]
+        [TestOf(nameof(ICameraFileNameConverter.Convert))]
+        public void Convert_SkipDateSubDirectoryIsTrue_DestinationSubDirectoryIsNotAltered()
+        {
+            var fixture = NewFixture();
+            fixture
+                .Freeze<Mock<ICameraFileFactory>>()
+                .Setup(f => f.Create(It.IsAny<string>(), It.IsAny<IEnumerable<ITag>>()))
+                .Returns(Mock.Of<ICameraFile>(f => f.Created == new DateTime(2019, 08, 25)));
+            var cameraFileNameConverter = fixture.Create<CameraFileNameConverter>();
+            cameraFileNameConverter.SkipDateSubDirectory = true;
+            ICameraFileNameConverter sut = cameraFileNameConverter;
+
+            var (result, _) = sut.Convert("sourceDir/IMG_1234.jpg", "destDir");
+
+            Assert.AreEqual("destDir", result);
         }
 
         [Test]
@@ -55,7 +75,10 @@ namespace CameraUtility.Tests
                         f.DestinationNamePrefix == "IMG_" &&
                         f.Extension == ".jpg" &&
                         f.Created == new DateTime(2019, 08, 25, 14, 39, 42, 123)));
-            ICameraFileNameConverter sut = fixture.Create<CameraFileNameConverter>();
+            var cameraFileNameConverter = fixture.Create<CameraFileNameConverter>();
+            cameraFileNameConverter.SkipDateSubDirectory = false;
+            ICameraFileNameConverter sut = cameraFileNameConverter;
+            
 
             var (_, result) = sut.Convert("sourceDir/IMG_1234.jpg", "destDir");
 

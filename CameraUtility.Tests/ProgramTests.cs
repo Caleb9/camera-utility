@@ -125,6 +125,7 @@ namespace CameraUtility.Tests
                     "destDir",
                     false,
                     false,
+                    false,
                     false));
             var fileSystemMock = SetupFilesInFileSystem(fixture, "sourceDir");
             var sut = fixture.Create<Program>();
@@ -162,7 +163,8 @@ namespace CameraUtility.Tests
                     "destDir",
                     false,
                     false,
-                    true));
+                    true,
+                    false));
             var fileSystemMock = SetupFilesInFileSystem(fixture, "sourceDir");
             var sut = fixture.Create<Program>();
 
@@ -200,7 +202,8 @@ namespace CameraUtility.Tests
                     "destDir",
                     true,
                     false,
-                    moveMode));
+                    moveMode,
+                    false));
             var fileSystemMock = SetupFilesInFileSystem(fixture, "sourceDir");
             var sut = fixture.Create<Program>();
 

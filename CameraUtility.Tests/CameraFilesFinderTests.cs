@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -9,6 +10,7 @@ namespace CameraUtility.Tests
 {
     [TestFixture]
     [TestOf(typeof(CameraFilesFinder))]
+    [ExcludeFromCodeCoverage]
     public class CameraFilesFinderTests
     {
         private IFixture CreateFixture()

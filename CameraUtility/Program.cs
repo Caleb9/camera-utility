@@ -46,7 +46,10 @@ namespace CameraUtility
                                             metadataReader),
                                         new ExceptionHandlingCameraFileFactoryDecorator(
                                             new CameraFileFactory()),
-                                        fileSystem),
+                                        fileSystem)
+                                    {
+                                        SkipDateSubDirectory = options.SkipDateSubDirectory
+                                    },
                                     fileSystem,
                                     options.DryRun,
                                     copyOrMove)
@@ -139,13 +142,15 @@ namespace CameraUtility
                 string? destinationDirectory,
                 bool dryRun,
                 bool tryContinueOnError,
-                bool moveMode)
+                bool moveMode,
+                bool skipDateSubDirectory)
             {
                 SourcePath = sourcePath;
                 DestinationDirectory = destinationDirectory;
                 DryRun = dryRun;
                 TryContinueOnError = tryContinueOnError;
                 MoveMode = moveMode;
+                SkipDateSubDirectory = skipDateSubDirectory;
             }
 
             [Option('s', "src-path", Required = true,
@@ -170,6 +175,10 @@ namespace CameraUtility
             [Option('m', "move", Required = false, Default = false,
                 HelpText = "Move files instead of just copying them.")]
             public bool MoveMode { get; }
+            
+            [Option("skip-date-subdir", Required = false, Default = false,
+                HelpText = "Do not create date sub-directories in destination directory.")]
+            public bool SkipDateSubDirectory { get; }
         }
     }
 }

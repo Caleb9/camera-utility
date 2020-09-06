@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <!-- Nullable reference types -->
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>default</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
@@ -43,8 +43,8 @@
 
   <ItemGroup>
     <!-- NuGet packages -->
-    <PackageReference Include="CommandLineParser" Version="2.7.82" />
-    <PackageReference Include="MetadataExtractor" Version="2.3.0" />
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <PackageReference Include="MetadataExtractor" Version="2.4.3" />
   </ItemGroup>
 
 </Project>

@@ -63,7 +63,7 @@ namespace CameraUtility
             _options = options;
         }
 
-        public static void Main(
+        private static void Main(
             string[] args)
         {
             var options = ParseArgs(args);

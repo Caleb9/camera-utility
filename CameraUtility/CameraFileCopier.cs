@@ -38,7 +38,9 @@ namespace CameraUtility
                 _cameraFileNameConverter.Convert(cameraFilePath, destinationDirectoryRoot);
 
             if (_fileSystem.CreateDirectoryIfNotExists(destinationPath, _pretend))
+            {
                 Console?.WriteLine($"Created {destinationPath}");
+            }
 
             var copied = _copyOrMoveMode switch
             {

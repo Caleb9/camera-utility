@@ -60,7 +60,7 @@ is taken.
 ## Supported File Types
 
 Currently camera-util finds files of following types:
-* JPG
+* JPG / JPEG (note that extension stays unaffected)
 * CR2 (Canon's raw format)
 * DNG (Android's raw format)
 * MP4 (Video)

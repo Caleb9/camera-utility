@@ -116,6 +116,7 @@ namespace CameraUtility.Tests
         
         [TestCase("cr2")]
         [TestCase("jpg")]
+        [TestCase("jpeg")]
         [TestCase("dng")]
         [TestCase("mp4")]
         [TestOf(nameof(ICameraFilesFinder.FindCameraFiles))]

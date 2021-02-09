@@ -13,6 +13,7 @@ namespace CameraUtility
         private static readonly string[] CameraFileExtensions =
         {
             ".jpg",
+            ".jpeg",
             ".cr2",
             ".dng",
             ".mp4"

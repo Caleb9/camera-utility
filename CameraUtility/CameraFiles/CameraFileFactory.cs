@@ -12,6 +12,7 @@ namespace CameraUtility.CameraFiles
             switch (FileNameUtil.GetExtension(filePath).ToLowerInvariant())
             {
                 case ".jpg":
+                case ".jpeg":
                 case ".cr2":
                     return new ImageFile(filePath, metadata);
                 case ".dng":

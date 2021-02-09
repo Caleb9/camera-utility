@@ -86,6 +86,7 @@ namespace CameraUtility.Tests
         }
         
         [TestCase(".jpg")]
+        [TestCase(".jpeg")]
         [TestCase(".cr2")]
         [TestCase(".mp4")]
         [TestCase(".dng")]

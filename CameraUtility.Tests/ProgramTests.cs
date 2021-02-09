@@ -97,7 +97,7 @@ namespace CameraUtility.Tests
                 .Setup(fs => fs.GetFiles(sourceDir, "*"))
                 .Returns(new[] {
                     $"{sourceDir}/IMG_1234.JPG",
-                    $"{sourceDir}/IMG_4231.JPG",
+                    $"{sourceDir}/IMG_4231.JPEG",
                     $"{sourceDir}/IMG_1234.CR2",
                     $"{sourceDir}/MVI_1234.MP4" });
             fixture
@@ -139,7 +139,7 @@ namespace CameraUtility.Tests
                 fileSystemMock, "sourceDir/IMG_1234.JPG", "destDir/2010_01_12/IMG_20100112_131415420.JPG");
             AssertDirectoryCreated(fileSystemMock, "destDir/2011_02_13");
             AssertFileCopied(
-                fileSystemMock, "sourceDir/IMG_4231.JPG", "destDir/2011_02_13/IMG_20110213_141516430.JPG");
+                fileSystemMock, "sourceDir/IMG_4231.JPEG", "destDir/2011_02_13/IMG_20110213_141516430.JPEG");
             AssertDirectoryCreated(fileSystemMock, "destDir/2012_03_14");
             AssertFileCopied(
                 fileSystemMock, "sourceDir/IMG_1234.CR2", "destDir/2012_03_14/IMG_20120314_151617440.CR2");
@@ -177,7 +177,7 @@ namespace CameraUtility.Tests
                 fileSystemMock, "sourceDir/IMG_1234.JPG", "destDir/2010_01_12/IMG_20100112_131415420.JPG");
             AssertDirectoryCreated(fileSystemMock, "destDir/2011_02_13");
             AssertFileMoved(
-                fileSystemMock, "sourceDir/IMG_4231.JPG", "destDir/2011_02_13/IMG_20110213_141516430.JPG");
+                fileSystemMock, "sourceDir/IMG_4231.JPEG", "destDir/2011_02_13/IMG_20110213_141516430.JPEG");
             AssertDirectoryCreated(fileSystemMock, "destDir/2012_03_14");
             AssertFileMoved(
                 fileSystemMock, "sourceDir/IMG_1234.CR2", "destDir/2012_03_14/IMG_20120314_151617440.CR2");

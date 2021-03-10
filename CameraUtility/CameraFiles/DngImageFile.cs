@@ -9,7 +9,8 @@ namespace CameraUtility.CameraFiles
     /// <summary>
     ///     Raw Android photo.
     /// </summary>
-    public sealed class DngImageFile : AbstractCameraFile, ICameraFile
+    public sealed class DngImageFile :
+        AbstractCameraFile, ICameraFile
     {
         /// <summary>
         ///     <see href="https://www.media.mit.edu/pia/Research/deepview/exif.html" />

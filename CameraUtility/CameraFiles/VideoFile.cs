@@ -9,7 +9,8 @@ namespace CameraUtility.CameraFiles
     /// <summary>
     ///     Mp4 video (Android and Canon)
     /// </summary>
-    public sealed class VideoFile : AbstractCameraFile, ICameraFile
+    public sealed class VideoFile :
+        AbstractCameraFile, ICameraFile
     {
         private const int QuickTimeCreatedTag = 0x3;
 

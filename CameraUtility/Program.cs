@@ -118,7 +118,7 @@ namespace CameraUtility
 
         private ConsoleCancelEventHandler Abort()
         {
-            return (sender, eventArgs) =>
+            return (_, _) =>
             {
                 _cancellationTokenSource.Cancel();
                 /* Give us a chance to print out a goodbye message and the report. */

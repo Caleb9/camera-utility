@@ -6,7 +6,7 @@ init:
   - git config --global core.autocrlf true
 
 install:
-  - dotnet tool install --global --version 5.1.3 gitversion.tool
+  - dotnet tool install --global --version 5.6.6 gitversion.tool
 
 before_build:
   # Display versions of used tools

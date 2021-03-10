@@ -16,7 +16,8 @@ namespace CameraUtility
             ".jpeg",
             ".cr2",
             ".dng",
-            ".mp4"
+            ".mp4",
+            ".mov"
         };
 
         private readonly IFileSystem _fileSystem;

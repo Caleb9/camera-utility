@@ -18,6 +18,7 @@ namespace CameraUtility.CameraFiles
                 case ".dng":
                     return new DngImageFile(filePath, metadata);
                 case ".mp4":
+                case ".mov":
                     return new VideoFile(filePath, metadata);
                 default:
                     throw new InvalidPathException($"Unknown file type {filePath}");

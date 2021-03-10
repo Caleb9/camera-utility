@@ -99,14 +99,17 @@ namespace CameraUtility.Tests
                     $"{sourceDir}/IMG_1234.JPG",
                     $"{sourceDir}/IMG_4231.JPEG",
                     $"{sourceDir}/IMG_1234.CR2",
-                    $"{sourceDir}/MVI_1234.MP4" });
+                    $"{sourceDir}/MVI_1234.MP4",
+                    $"{sourceDir}/MVI_2345.MOV"
+                });
             fixture
                 .Freeze<Mock<IMetadataReader>>()
                 .SetupSequence(mr => mr.ExtractTags(It.IsAny<string>()))
                 .Returns(NewImageFileTags("2010:01:12 13:14:15", "42"))
                 .Returns(NewImageFileTags("2011:02:13 14:15:16", "43"))
                 .Returns(NewImageFileTags("2012:03:14 15:16:17", "44"))
-                .Returns(new[] { NewQuickTimeCreatedTag("Fri Jun 13 14.15.16 1980") });
+                .Returns(new[] { NewQuickTimeCreatedTag("Fri Jun 13 14.15.16 1980") })
+                .Returns(new[] { NewQuickTimeCreatedTag("Fri Jun 13 15.16.17 1980") });
             return fileSystemMock;
         }
         
@@ -115,7 +118,7 @@ namespace CameraUtility.Tests
         /// </summary>
         [Test]
         [TestOf(nameof(Program.Execute))]
-        public void Execute__FourImageFiles_CopyMode__FilesGetCopied()
+        public void Execute__FiveImageFiles_CopyMode__FilesGetCopied()
         {
             /* Arrange */
             var fixture = NewFixture();
@@ -146,6 +149,8 @@ namespace CameraUtility.Tests
             AssertDirectoryCreated(fileSystemMock, "destDir/1980_06_13");
             AssertFileCopied(
                 fileSystemMock, "sourceDir/MVI_1234.MP4", "destDir/1980_06_13/VID_19800613_141516000.MP4");
+            AssertFileCopied(
+                fileSystemMock, "sourceDir/MVI_2345.MOV", "destDir/1980_06_13/VID_19800613_151617000.MOV");
         }
         
         /// <summary>
@@ -184,6 +189,8 @@ namespace CameraUtility.Tests
             AssertDirectoryCreated(fileSystemMock, "destDir/1980_06_13");
             AssertFileMoved(
                 fileSystemMock, "sourceDir/MVI_1234.MP4", "destDir/1980_06_13/VID_19800613_141516000.MP4");
+            AssertFileMoved(
+                fileSystemMock, "sourceDir/MVI_2345.MOV", "destDir/1980_06_13/VID_19800613_151617000.MOV");
         }
         
         /// <summary>

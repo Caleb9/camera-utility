@@ -64,6 +64,7 @@ Currently camera-util finds files of following types:
 * CR2 (Canon's raw format)
 * DNG (Android's raw format)
 * MP4 (Video)
+* MOV (Video)
 
 
 ## How to Use

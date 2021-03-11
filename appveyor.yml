@@ -49,15 +49,12 @@ matrix:
 
 configuration: Release
 
-build_script:
-  - dotnet build --verbosity m --configuration $CONFIGURATION --runtime $CameraUtility_runtime
-
 test_script:
-  - dotnet test --verbosity m --configuration $CONFIGURATION --no-build
+  - dotnet test --verbosity m --configuration $CONFIGURATION
     --runtime $CameraUtility_runtime --logger:AppVeyor;
 
 after_test:
-  - dotnet publish --verbosity m --configuration $CONFIGURATION --no-build
+  - dotnet publish --verbosity m --configuration $CONFIGURATION
     --runtime $CameraUtility_runtime --output $CameraUtility_PublishFolder
     $CameraUtility_ConsoleAppProject
     /p:PublishSingleFile=true /p:PublishTrimmed=true /p:DebugType=None
@@ -68,12 +65,12 @@ artifacts:
   - path: $(CameraUtility_ConsoleAppName)-$(GitVersion_FullSemVer)-$(CameraUtility_runtime).zip
 
 deploy:
-  release: $(GitVersion_FullSemVer)
-  description: ''
-  provider: GitHub
-  auth_token:
-    secure: /YPgr1Fez43MdWKzvzO10XbOLKPQ6gTeYj0L5QG/ZNb1P7utd529LhWGfTKpQb9p
-  draft: true
-  prerelease: false
-  on:
-    APPVEYOR_REPO_TAG: true
+  - release: $(GitVersion_FullSemVer)
+    description: ''
+    provider: GitHub
+    auth_token:
+      secure: /YPgr1Fez43MdWKzvzO10XbOLKPQ6gTeYj0L5QG/ZNb1P7utd529LhWGfTKpQb9p
+    draft: true
+    prerelease: false
+    on:
+      APPVEYOR_REPO_TAG: true

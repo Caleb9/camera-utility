@@ -1,19 +1,11 @@
-﻿using System;
-
-namespace CameraUtility.Utils
+﻿namespace CameraUtility.Utils
 {
-    public static class FileNameUtil
+    internal static class FileNameUtil
     {
-        public static string GetExtension(string imagePath)
+        internal static string GetExtension(string imagePath)
         {
-            try
-            {
-                return imagePath.Substring(imagePath.LastIndexOf('.'));
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                return string.Empty;
-            }
+            var extensionIndex = imagePath.LastIndexOf('.');
+            return extensionIndex < 0 ? string.Empty : imagePath[extensionIndex..];
         }
     }
 }

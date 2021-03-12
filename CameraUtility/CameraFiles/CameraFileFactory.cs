@@ -5,9 +5,9 @@ using CameraUtility.Utils;
 
 namespace CameraUtility.CameraFiles
 {
-    public sealed class CameraFileFactory : ICameraFileFactory
+    internal sealed class CameraFileFactory
     {
-        ICameraFile ICameraFileFactory.Create(string filePath, IEnumerable<ITag> metadata)
+        internal ICameraFile Create(string filePath, IEnumerable<ITag> metadata)
         {
             switch (FileNameUtil.GetExtension(filePath).ToLowerInvariant())
             {

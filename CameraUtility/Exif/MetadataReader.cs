@@ -6,7 +6,7 @@ using MetadataExtractor;
 
 namespace CameraUtility.Exif
 {
-    public sealed class MetadataReader : IMetadataReader
+    internal sealed class MetadataReader : IMetadataReader
     {
         IEnumerable<ITag> IMetadataReader.ExtractTags(string filePath)
         {

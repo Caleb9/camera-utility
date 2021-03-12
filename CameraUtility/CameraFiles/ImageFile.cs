@@ -40,6 +40,8 @@ namespace CameraUtility.CameraFiles
         private ITag FindCreatedDateTimeTag(
             IList<ITag> exifTags)
         {
+            // TODO InvalidOperationException is not very meaningful for the user. Introduce a factory method and return
+            // Result
             return exifTags.FirstOrDefault(t => t.Type == DateTimeOriginalTagType)
                    /* Try fallback tag, if not found then an exception will be thrown */
                    ?? exifTags.First(t => t.Type == FallbackDateTimeTagType);

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
-using CameraUtility.FileSystemIsolation;
+using CSharpFunctionalExtensions;
 
 namespace CameraUtility
 {
-    public sealed class CameraFilesFinder : ICameraFilesFinder
+    internal sealed class CameraFilesFinder
     {
         private static readonly string[] CameraFileExtensions =
         {
@@ -22,31 +22,33 @@ namespace CameraUtility
 
         private readonly IFileSystem _fileSystem;
 
-        public CameraFilesFinder(
+        internal CameraFilesFinder(
             IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
         }
 
+        internal event EventHandler<long> OnCameraFilesFound = (_, _) => { };
 
-        IEnumerable<string> ICameraFilesFinder.FindCameraFiles(
+        internal Result<IEnumerable<string>> FindCameraFiles(
             string path)
         {
-            if (!_fileSystem.Exists(path))
+            if (_fileSystem.Directory.Exists(path) is false && _fileSystem.File.Exists(path) is false)
             {
-                throw new PathNotFoundException($"{path} not found");
+                return Result.Failure<IEnumerable<string>>($"{path} does not exist.");
             }
 
-            return FindFilePaths(path).Where(IsCameraFile).AsParallel();
+            var result = FindFilePaths(path).Where(IsCameraFile).AsParallel().ToList();
+            OnCameraFilesFound(this, result.Count);
+            return result;
         }
-
 
         private IEnumerable<string> FindFilePaths(
             string path)
         {
-            Debug.Assert(_fileSystem.Exists(path));
-
-            return _fileSystem.IsDirectory(path) ? _fileSystem.GetFiles(path) : new[] {path};
+            return _fileSystem.Directory.Exists(path)
+                ? _fileSystem.Directory.GetFiles(path, "*", SearchOption.AllDirectories)
+                : new[] {path};
         }
 
         private bool IsCameraFile(
@@ -55,14 +57,6 @@ namespace CameraUtility
             const bool ignoreCase = true;
             return CameraFileExtensions.Any(
                 supportedExtension => filePath.EndsWith(supportedExtension, ignoreCase, CultureInfo.InvariantCulture));
-        }
-
-        public sealed class PathNotFoundException : IOException
-        {
-            public PathNotFoundException(string? message, Exception? innerException = null)
-                : base(message, innerException)
-            {
-            }
         }
     }
 }

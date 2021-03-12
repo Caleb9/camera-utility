@@ -17,7 +17,7 @@ namespace CameraUtility.CameraFiles
         public VideoFile(string fullName, IEnumerable<ITag> exifTags)
             : base(fullName)
         {
-            var createdTag = 
+            var createdTag =
                 exifTags.First(t => t.Directory == "QuickTime Movie Header" && t.Type == QuickTimeCreatedTag);
             Created = DateTime.ParseExact(createdTag.Value, "ddd MMM dd HH.mm.ss yyyy", CultureInfo.InvariantCulture);
         }

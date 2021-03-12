@@ -1,38 +1,37 @@
-﻿using System;
+using System;
+using System.IO.Abstractions;
 using CameraUtility.CameraFiles;
+using CameraUtility.Commands.ImageFilesTransfer.Execution;
 using CameraUtility.Exif;
-using CameraUtility.FileSystemIsolation;
 
 namespace CameraUtility
 {
-    public sealed class CameraFileNameConverter
-        : ICameraFileNameConverter
+    internal sealed class CameraFileNameConverter
     {
-        private readonly ICameraFileFactory _cameraFileFactory;
+        private readonly CameraFileFactory _cameraFileFactory;
         private readonly IFileSystem _fileSystem;
         private readonly IMetadataReader _metadataReader;
 
-        public CameraFileNameConverter(
+        internal CameraFileNameConverter(
             IMetadataReader metadataReader,
-            ICameraFileFactory cameraFileFactory,
+            CameraFileFactory cameraFileFactory,
             IFileSystem fileSystem)
         {
             _metadataReader = metadataReader;
-            _fileSystem = fileSystem;
             _cameraFileFactory = cameraFileFactory;
+            _fileSystem = fileSystem;
         }
 
-        public bool SkipDateSubDirectory { get; set; } = false;
-
-        (string destinationDirectory, string destinationFileFullName) ICameraFileNameConverter.Convert(
-            string cameraFilePath,
-            string destinationRootPath)
+        internal (string destinationDirectory, string destinationFileName) Convert(
+            CameraFileTransferer.Args args)
         {
+            var (cameraFilePath, destinationRootDirectory, _, skipDateSubdirectoryOption) = args;
             var cameraFile = GetCameraFile(cameraFilePath);
-            var destinationDirectory = GetDestinationDirectory(destinationRootPath, cameraFile);
-            var destinationFileFullName = GetDestinationFileFullName(destinationDirectory, cameraFile);
+            var destinationDirectory =
+                GetDestinationDirectory(destinationRootDirectory, cameraFile, skipDateSubdirectoryOption);
+            var destinationFileName = GetDestinationFileName(cameraFile);
 
-            return (destinationDirectory, destinationFileFullName);
+            return (destinationDirectory, destinationFileName);
         }
 
         private ICameraFile GetCameraFile(
@@ -44,14 +43,16 @@ namespace CameraUtility
 
         private string GetDestinationDirectory(
             string destinationRootPath,
-            ICameraFile cameraFile)
+            ICameraFile cameraFile,
+            bool skipDateSubDirectory)
         {
-            if (SkipDateSubDirectory)
+            if (skipDateSubDirectory)
             {
                 return destinationRootPath;
             }
+
             var destinationSubDirectory = GetDateSubDirectoryName(cameraFile.Created);
-            return _fileSystem.CombinePaths(destinationRootPath, destinationSubDirectory);
+            return _fileSystem.Path.Combine(destinationRootPath, destinationSubDirectory);
         }
 
         private string GetDateSubDirectoryName(
@@ -60,16 +61,7 @@ namespace CameraUtility
             return $"{created.Year:0000}_{created.Month:00}_{created.Day:00}";
         }
 
-        private string GetDestinationFileFullName(
-            string destinationDirectory, 
-            ICameraFile cameraFile)
-        {
-            var fileName = NewCameraFileName(cameraFile);
-            var destinationFileFullName = _fileSystem.CombinePaths(destinationDirectory, fileName);
-            return destinationFileFullName;
-        }
-
-        private string NewCameraFileName(
+        private string GetDestinationFileName(
             ICameraFile cameraFile)
         {
             return $"{cameraFile.DestinationNamePrefix}{GetDateForFileName(cameraFile.Created)}" +

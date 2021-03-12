@@ -1,119 +1,166 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Parsing;
+using System.IO;
+using System.IO.Abstractions;
+using System.Reflection;
 using System.Threading;
 using CameraUtility.CameraFiles;
-using CameraUtility.ExceptionHandling;
+using CameraUtility.Commands.ImageFilesTransfer;
+using CameraUtility.Commands.ImageFilesTransfer.Execution;
+using CameraUtility.Commands.ImageFilesTransfer.Output;
 using CameraUtility.Exif;
-using CameraUtility.FileSystemIsolation;
-using CameraUtility.Reporting;
-using CommandLine;
 
 namespace CameraUtility
 {
-    public class Program
+    public sealed class Program
     {
-        private readonly ICameraDirectoryCopier _cameraDirectoryCopier;
-        private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly Options _options;
-        private readonly Report _report;
+        private const int CancelledExitCode = 2;
 
-        /* AutoFixture uses this constructor implicitly. It should not be made private. */
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        private readonly CancellationTokenSource _cancellationTokenSource;
+
+        private readonly CopyCommand _copyCommand;
+        private readonly MoveCommand _moveCommand;
+
+        private readonly TextWriter _outputWriter;
+
         public Program(
-            Options options,
             IFileSystem fileSystem,
             IMetadataReader metadataReader,
+            TextWriter outputWriter,
             CancellationTokenSource cancellationTokenSource)
         {
             /* Composition Root. Out of process resources can be swapped with fakes in tests. */
-            var copyOrMove = options.MoveMode ? CopyOrMoveMode.Move : CopyOrMoveMode.Copy;
-            _report = new Report(copyOrMove);
-            fileSystem = new CountingFileSystemDecorator(fileSystem, _report);
-            _cameraDirectoryCopier =
-                new ExceptionHandlingCameraDirectoryCopierDecorator(
-                    new CopyingOrchestrator(
-                        new CountingCameraFilesFinderDecorator(
-                            new CameraFilesFinder(
-                                fileSystem),
-                            _report),
-                        new ExceptionHandlingCameraFileCopierDecorator(
-                            new CountingCameraFileCopierDecorator(
-                                new CameraFileCopier(
-                                    new CameraFileNameConverter(
-                                        new ExceptionHandlingMetadataReaderDecorator(
-                                            metadataReader),
-                                        new ExceptionHandlingCameraFileFactoryDecorator(
-                                            new CameraFileFactory()),
-                                        fileSystem)
-                                    {
-                                        SkipDateSubDirectory = options.SkipDateSubDirectory
-                                    },
-                                    fileSystem,
-                                    options.DryRun,
-                                    copyOrMove)
-                                {
-                                    Console = Console.Out
-                                },
-                                _report),
-                            options.TryContinueOnError
-                        )));
+            _outputWriter = outputWriter;
             _cancellationTokenSource = cancellationTokenSource;
-            _options = options;
+            var report = new Report(_outputWriter);
+            var cameraFilesFinder = new CameraFilesFinder(fileSystem);
+            cameraFilesFinder.OnCameraFilesFound += report.HandleCameraFilesFound;
+            var cameraFileNameConverter =
+                new CameraFileNameConverter(
+                    metadataReader,
+                    new CameraFileFactory(),
+                    fileSystem);
+            var consoleOutput = new ConsoleOutput(_outputWriter);
+            var cameraFileCopier =
+                new CameraFileTransferer(
+                    cameraFileNameConverter,
+                    fileSystem,
+                    (s, d, o) => fileSystem.File.Copy(s, d, o));
+            cameraFileCopier.OnFileTransferred +=
+                (_, args) => consoleOutput.HandleFileCopied(args.sourceFile, args.destinationFile);
+            AssignEventHandlersForCameraFileTransferer(cameraFileCopier);
+            var internalCopyingOrchestrator =
+                new Orchestrator(
+                    cameraFilesFinder,
+                    cameraFileCopier,
+                    _cancellationTokenSource.Token);
+            internalCopyingOrchestrator.OnError +=
+                (_, error) => consoleOutput.HandleError(error);
+            internalCopyingOrchestrator.OnException +=
+                (_, args) => consoleOutput.HandleException(args.filePath, args.exception);
+            internalCopyingOrchestrator.OnException +=
+                (_, args) => report.AddExceptionForFile(args.filePath, args.exception);
+            internalCopyingOrchestrator.OnException +=
+                (_, _) => report.IncrementProcessed();
+            IOrchestrator copyingOrchestrator =
+                new ReportingOrchestratorDecorator(
+                    internalCopyingOrchestrator,
+                    report);
+            var cameraFileMover =
+                new CameraFileTransferer(
+                    cameraFileNameConverter,
+                    fileSystem,
+                    (s, d, o) => fileSystem.File.Move(s, d, o));
+            cameraFileMover.OnFileTransferred +=
+                (_, args) => consoleOutput.HandleFileMoved(args.sourceFile, args.destinationFile);
+            AssignEventHandlersForCameraFileTransferer(cameraFileMover);
+            var internalMovingOrchestrator =
+                new Orchestrator(
+                    cameraFilesFinder,
+                    cameraFileMover,
+                    _cancellationTokenSource.Token);
+            internalMovingOrchestrator.OnError +=
+                (_, error) => consoleOutput.HandleError(error);
+            internalMovingOrchestrator.OnException +=
+                (_, args) => consoleOutput.HandleException(args.filePath, args.exception);
+            internalMovingOrchestrator.OnException +=
+                (_, args) => report.AddExceptionForFile(args.filePath, args.exception);
+            internalMovingOrchestrator.OnException +=
+                (_, _) => report.IncrementProcessed();
+            IOrchestrator movingOrchestrator =
+                new ReportingOrchestratorDecorator(
+                    internalMovingOrchestrator,
+                    report);
+
+            _copyCommand = new CopyCommand(args => copyingOrchestrator.Execute(args));
+            _moveCommand = new MoveCommand(args => movingOrchestrator.Execute(args));
+
+            void AssignEventHandlersForCameraFileTransferer(
+                CameraFileTransferer cameraFileTransferer)
+            {
+                cameraFileTransferer.OnDirectoryCreated +=
+                    (_, directory) => consoleOutput.HandleCreatedDirectory(directory);
+                cameraFileTransferer.OnFileSkipped +=
+                    (_, args) => consoleOutput.HandleFileSkipped(args.sourceFile, args.destinationFile);
+                cameraFileTransferer.OnFileSkipped +=
+                    (_, args) => report.AddSkippedFile(args.sourceFile, args.destinationFile);
+                cameraFileTransferer.OnFileSkipped +=
+                    (_, _) => report.IncrementProcessed();
+                cameraFileTransferer.OnFileTransferred +=
+                    (_, _) => report.IncrementProcessed();
+                cameraFileTransferer.OnFileTransferred +=
+                    (_, args) => report.IncrementTransferred(args.dryRun);
+            }
         }
 
-        private static void Main(
-            string[] args)
+        private static int Main(string[] args)
         {
-            var options = ParseArgs(args);
-            if (options is null)
-            {
-                Environment.Exit(1);
-            }
-
-            /* Compose the application with "real" implementations of FileSystem and MetadataReader. */
+            /* Compose the application with "real" dependencies. */
             var program =
                 new Program(
-                    options,
                     new FileSystem(),
                     new MetadataReader(),
+                    Console.Out,
                     new CancellationTokenSource());
 
             Console.CancelKeyPress += program.Abort();
 
+            return program.Execute(args);
+        }
+
+        public int Execute(params string[] args)
+        {
+            var parser =
+                new CommandLineBuilder(
+                        new RootCommand
+                        {
+                            _copyCommand,
+                            _moveCommand
+                        })
+                    /* Workaround https://github.com/dotnet/command-line-api/issues/796#issuecomment-673083521 */
+                    .UseVersionOption()
+                    .UseHelp()
+                    .UseEnvironmentVariableDirective()
+                    .UseParseDirective()
+                    .UseDebugDirective()
+                    .UseSuggestDirective()
+                    .RegisterWithDotnetSuggest()
+                    .UseTypoCorrections()
+                    .UseParseErrorReporting()
+                    .CancelOnProcessTermination()
+                    .UseExceptionHandler((exception, _) => throw exception)
+                    .Build();
             try
             {
-                program.Execute();
+                return parser.Invoke(args);
             }
-            catch (OperationCanceledException)
+            catch (TargetInvocationException exception) when (exception.InnerException is OperationCanceledException)
             {
-                Console.WriteLine("Operation interrupted by user.");
+                _outputWriter.WriteLine("Operation interrupted by user.");
+                return CancelledExitCode;
             }
-            finally
-            {
-                program.PrintReport();
-            }
-        }
-
-        private static Options? ParseArgs(
-            IEnumerable<string> args)
-        {
-            Options? result = null;
-            Parser.Default.ParseArguments<Options?>(args)
-                .WithParsed(options => result = options);
-            return result;
-        }
-
-        public void Execute()
-        {
-            Debug.Assert(_options.SourcePath != null, "_options.SourceDirectory != null");
-            Debug.Assert(_options.DestinationDirectory != null, "_options.DestinationDirectory != null");
-            
-            _cameraDirectoryCopier.CopyCameraFiles(
-                _options.SourcePath,
-                _options.DestinationDirectory,
-                _cancellationTokenSource.Token);
         }
 
         private ConsoleCancelEventHandler Abort()
@@ -124,61 +171,6 @@ namespace CameraUtility
                 /* Give us a chance to print out a goodbye message and the report. */
                 Thread.Sleep(1000);
             };
-        }
-
-        private void PrintReport()
-        {
-            var printErrors = _options.TryContinueOnError;
-            _report.PrintReport(printErrors);
-        }
-
-        /// <summary>
-        ///     Command line options.
-        /// </summary>
-        public sealed class Options
-        {
-            public Options(
-                string? sourcePath,
-                string? destinationDirectory,
-                bool dryRun,
-                bool tryContinueOnError,
-                bool moveMode,
-                bool skipDateSubDirectory)
-            {
-                SourcePath = sourcePath;
-                DestinationDirectory = destinationDirectory;
-                DryRun = dryRun;
-                TryContinueOnError = tryContinueOnError;
-                MoveMode = moveMode;
-                SkipDateSubDirectory = skipDateSubDirectory;
-            }
-
-            [Option('s', "src-path", Required = true,
-                HelpText = "Path to a camera file (image or video) or a directory containing camera files. " +
-                           "All sub-directories will be scanned as well.")]
-            public string? SourcePath { get; }
-
-            [Option('d', "dest-dir", Required = true,
-                HelpText = "Destination directory root path where files will be copied into auto-created" +
-                           " sub-directories named after file creation date (e.g. 2019_08_22/).")]
-            public string? DestinationDirectory { get; }
-
-            [Option('n', "dry-run", Required = false, Default = false,
-                HelpText = "If present, no actual files will be copied. " +
-                           "The output will contain information about source and destination paths.")]
-            public bool DryRun { get; }
-
-            [Option('k', "keep-going", Required = false, Default = false,
-                HelpText = "Try to continue operation when errors for individual files occur.")]
-            public bool TryContinueOnError { get; }
-            
-            [Option('m', "move", Required = false, Default = false,
-                HelpText = "Move files instead of just copying them.")]
-            public bool MoveMode { get; }
-            
-            [Option("skip-date-subdir", Required = false, Default = false,
-                HelpText = "Do not create date sub-directories in destination directory.")]
-            public bool SkipDateSubDirectory { get; }
         }
     }
 }

@@ -9,7 +9,6 @@
 
   <PropertyGroup>
     <!-- Nullable reference types -->
-    <LangVersion>default</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
@@ -42,9 +41,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- NuGet packages -->
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.15.0" />
     <PackageReference Include="MetadataExtractor" Version="2.4.3" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20574.7" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.25" />
   </ItemGroup>
 
 </Project>

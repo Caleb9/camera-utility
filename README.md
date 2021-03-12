@@ -69,28 +69,41 @@ Currently camera-util finds files of following types:
 
 ## How to Use
 
-These are the command line options:
-```
-  -s, --src-path      Required. Path to a camera file (image or video) or a directory containing camera files. All
-                      sub-directories will be scanned as well.
-
-  -d, --dest-dir      Required. Destination directory root path where files will be copied into auto-created
-                      sub-directories named after file creation date (e.g. 2019_08_22/).
-
-  -n, --dry-run       (Default: false) If present, no actual files will be copied. The output will contain
-                      information about source and destination paths.
-
-  -k, --keep-going    (Default: false) Try to continue operation when errors for individual files occur.
-
-  -m, --move          (Default: false) Move files instead of just copying them.
-
-  --skip-date-subdir  (Default: false) Do not create date sub-directories in destination directory.
-
-  --help              Display this help screen.
-
-  --version           Display version information.
+There are two sub commands to use: `copy` and `move`:
 
 ```
+Usage:
+  camera-utility [options] [command]
+
+Options:
+  --version         Show version information
+  -?, -h, --help    Show help and usage information
+
+Commands:
+  copy    Copy files
+  move    Move files
+```
+
+Both commands take the following options:
+
+```
+Options:
+  -s, --src-path <src-path> (REQUIRED)    Path to a camera file (image or video) or a directory containing camera
+                                          files. When a directory is specified, all sub-directories will be
+                                          scanned as well.
+  -d, --dst-dir <dst-dir> (REQUIRED)      Destination directory root path where files will be copied or moved
+                                          into auto-created sub-directories named after file creation date (e.g.
+                                          2019_08_22/), unless --skip-date-subdir option is present.
+  -n, --dry-run                           If present, no actual files will be transferred. The output will
+                                          contain information about source and destination paths.
+  -k, --keep-going                        Try to continue operation when errors for individual files occur.
+  --skip-date-subdir                      Do not create date sub-directories in destination directory.
+  -?, -h, --help                          Show help and usage information
+```
+
+The `--src-path` and `--dst-dir` are the only required
+options. `--dry-run`, `--keep-going` and `--skip-date-subdir` can be
+added in any combination.
 
 By default (if `--keep-going` is not used), the application will bail
 out on first error, e.g. if it cannot read file's EXIF metadata (this
@@ -105,6 +118,24 @@ the files have valid metadata.
 
 The application is written in .NET Core, I have successfully used in
 on both Windows and Linux.
+
+
+### Examples
+
+```
+camera-utility copy --src-path /source/directory/path --dst-path /destination/path --dry-run --keep-going
+```
+
+```
+camera-utility move --src-path /source/directory/path --dst-path /destination/path --keep-going
+```
+
+```
+camera-utility copy --src-path /source/file.jpg --dst-path /destination/path --skip-date-subdir
+```
+
+etc.
+
 
 ## Things to Do
 

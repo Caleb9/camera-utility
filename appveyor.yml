@@ -37,6 +37,7 @@ environment:
   matrix:
     - CameraUtility_runtime: linux-x64
     - CameraUtility_runtime: win-x64
+    - CameraUtility_runtime: osx-x64
   # Custom environment variables used to publish artifacts. Note that this is executed BEFORE GitVersion
   # emits its variables, so it's not possible to use these variables in values here.
   CameraUtility_ConsoleAppProject: CameraUtility

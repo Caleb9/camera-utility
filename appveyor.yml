@@ -55,10 +55,16 @@ test_script:
     --runtime $CameraUtility_runtime --logger:AppVeyor;
 
 after_test:
-  - dotnet publish --verbosity m --configuration $CONFIGURATION
-    --runtime $CameraUtility_runtime --output $CameraUtility_PublishFolder
+  - dotnet publish
+    --verbosity m
+    --configuration $CONFIGURATION
+    --runtime $CameraUtility_runtime
+    --output $CameraUtility_PublishFolder
     $CameraUtility_ConsoleAppProject
-    /p:PublishSingleFile=true /p:PublishTrimmed=true /p:DebugType=None
+    /p:PublishSingleFile=true
+    /p:PublishTrimmed=true
+    /p:DebugType=None
+    /p:IncludeNativeLibrariesForSelfExtract=true
   - 7z a $CameraUtility_ConsoleAppName-$GitVersion_FullSemVer-$CameraUtility_runtime.zip
     $APPVEYOR_BUILD_FOLDER/$CameraUtility_PublishFolder/* $APPVEYOR_BUILD_FOLDER/LICENSE.txt
 

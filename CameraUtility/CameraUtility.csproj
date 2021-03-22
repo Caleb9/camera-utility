@@ -4,7 +4,6 @@
     <AssemblyName>camera-utility</AssemblyName>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <RuntimeIdentifiers>win-x64;linux-x64;osx.11.0-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <PropertyGroup>

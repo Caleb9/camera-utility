@@ -24,30 +24,36 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
 
         int IOrchestrator.Execute(AbstractTransferImageFilesCommand.OptionArgs args)
         {
-            var cameraFilesResult = _cameraFilesFinder.FindCameraFiles(args.SourcePath);
-            if (cameraFilesResult.IsFailure)
+            var cameraFilePathsResult = _cameraFilesFinder.FindCameraFiles(args.SourcePath);
+            if (cameraFilePathsResult.IsFailure)
             {
-                OnError(this, cameraFilesResult.Error);
+                OnError(this, cameraFilePathsResult.Error);
                 return ErrorResultCode;
             }
 
             var result = NoErrorsResultCode;
-            foreach (var cameraFilePath in cameraFilesResult.Value)
+            foreach (var cameraFilePath in cameraFilePathsResult.Value)
             {
                 _cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
-                    _cameraFileTransferer.TransferFile(
-                        new CameraFileTransferer.Args(
-                            cameraFilePath, args.DestinationDirectory, args.DryRun, args.SkipDateSubdirectory));
+                    var transferResult =
+                        _cameraFileTransferer.TransferFile(
+                            new CameraFileTransferer.Args(
+                                cameraFilePath, args.DestinationDirectory, args.DryRun, args.SkipDateSubdirectory));
+                    if (transferResult.IsFailure)
+                    {
+                        OnError(this, transferResult.Error);
+                        if (!args.KeepGoing)
+                        {
+                            return ErrorResultCode;
+                        }
+                    }
                 }
                 catch (Exception exception)
                 {
                     OnException(this, (cameraFilePath, exception));
-                    if (!args.KeepGoing)
-                    {
-                        return ErrorResultCode;
-                    }
+                    if (!args.KeepGoing) return ErrorResultCode;
 
                     result = ErrorResultCode;
                 }
@@ -58,6 +64,6 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
 
         internal event EventHandler<string> OnError = (_, _) => { };
 
-        internal event EventHandler<(string filePath, Exception exception)> OnException = (_, _) => { };
+        internal event EventHandler<(CameraFilePath filePath, Exception exception)> OnException = (_, _) => { };
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.IO.Abstractions;
 using CameraUtility.Commands.ImageFilesTransfer.Options;
+using CSharpFunctionalExtensions;
 
 namespace CameraUtility.Commands.ImageFilesTransfer.Execution
 {
@@ -20,22 +21,28 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
             _transferFiles = transferFiles;
         }
 
-        internal void TransferFile(Args args)
+        internal Result TransferFile(Args args)
         {
-            var (destinationDirectory, destinationFileName) = _cameraFileNameConverter.Convert(args);
+            var convertResult = _cameraFileNameConverter.Convert(args);
+            if (convertResult.IsFailure)
+            {
+                return convertResult;
+            }
 
+            var (destinationDirectory, destinationFileName) = convertResult.Value;
             if (!_fileSystem.Directory.Exists(destinationDirectory) && !args.DryRun)
             {
                 _fileSystem.Directory.CreateDirectory(destinationDirectory);
                 OnDirectoryCreated(this, destinationDirectory);
             }
 
-            var destinationFilePath = _fileSystem.Path.Combine(destinationDirectory, destinationFileName);
+            var destinationFilePath =
+                new CameraFilePath(_fileSystem.Path.Combine(destinationDirectory, destinationFileName));
             var destinationAlreadyExists = _fileSystem.File.Exists(destinationFilePath);
             if (destinationAlreadyExists)
             {
                 OnFileSkipped(this, (args.CameraFilePath, destinationFilePath));
-                return;
+                return Result.Success();
             }
 
             if (!args.DryRun)
@@ -44,24 +51,25 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
             }
 
             OnFileTransferred(this, (args.CameraFilePath, destinationFilePath, args.DryRun));
+            return Result.Success();
         }
 
         internal event EventHandler<string> OnDirectoryCreated =
             (_, _) => { };
 
-        internal event EventHandler<(string sourceFile, string destinationFile)> OnFileSkipped =
+        internal event EventHandler<(CameraFilePath sourceFile, CameraFilePath destinationFile)> OnFileSkipped =
             (_, _) => { };
 
-        internal event EventHandler<(string sourceFile, string destinationFile, DryRun dryRun)> OnFileTransferred =
-            (_, _) => { };
+        internal event EventHandler<(CameraFilePath sourceFile, CameraFilePath destinationFile, DryRun dryRun)>
+            OnFileTransferred = (_, _) => { };
 
         internal delegate void TransferFiles(
-            string sourcePath,
-            string destinationPath,
+            CameraFilePath sourcePath,
+            CameraFilePath destinationPath,
             bool overwrite = false);
 
         internal sealed record Args(
-            string CameraFilePath,
+            CameraFilePath CameraFilePath,
             DestinationDirectory DestinationRootDirectory,
             DryRun DryRun,
             SkipDateSubdirectory SkipDateSubdirectory);

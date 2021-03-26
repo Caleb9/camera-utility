@@ -7,6 +7,9 @@ using System.IO.Abstractions;
 using System.Reflection;
 using System.Threading;
 using CameraUtility.CameraFiles;
+using CameraUtility.Commands;
+using CameraUtility.Commands.Check;
+using CameraUtility.Commands.Check.Execution;
 using CameraUtility.Commands.ImageFilesTransfer;
 using CameraUtility.Commands.ImageFilesTransfer.Execution;
 using CameraUtility.Commands.ImageFilesTransfer.Output;
@@ -22,6 +25,7 @@ namespace CameraUtility
 
         private readonly CopyCommand _copyCommand;
         private readonly MoveCommand _moveCommand;
+        private readonly CheckCommand _checkCommand;
 
         private readonly TextWriter _outputWriter;
 
@@ -37,10 +41,11 @@ namespace CameraUtility
             var report = new Report(_outputWriter);
             var cameraFilesFinder = new CameraFilesFinder(fileSystem);
             cameraFilesFinder.OnCameraFilesFound += report.HandleCameraFilesFound;
+            var cameraFileFactory = new CameraFileFactory();
             var cameraFileNameConverter =
                 new CameraFileNameConverter(
                     metadataReader,
-                    new CameraFileFactory(),
+                    cameraFileFactory,
                     fileSystem);
             var consoleOutput = new ConsoleOutput(_outputWriter);
             var cameraFileCopier =
@@ -97,6 +102,14 @@ namespace CameraUtility
             _copyCommand = new CopyCommand(args => copyingOrchestrator.Execute(args));
             _moveCommand = new MoveCommand(args => movingOrchestrator.Execute(args));
 
+            var fileChecker =
+                new FileChecker(
+                    cameraFilesFinder,
+                    metadataReader,
+                    cameraFileFactory,
+                    new Commands.Check.Output.ConsoleOutput(_outputWriter));
+            _checkCommand = new CheckCommand(args => fileChecker.Execute(args));
+
             void AssignEventHandlersForCameraFileTransferer(
                 CameraFileTransferer cameraFileTransferer)
             {
@@ -137,7 +150,8 @@ namespace CameraUtility
                         new RootCommand
                         {
                             _copyCommand,
-                            _moveCommand
+                            _moveCommand,
+                            _checkCommand
                         })
                     /* Workaround https://github.com/dotnet/command-line-api/issues/796#issuecomment-673083521 */
                     .UseVersionOption()

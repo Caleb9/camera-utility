@@ -3,8 +3,9 @@ using System.IO.Abstractions;
 using CameraUtility.CameraFiles;
 using CameraUtility.Commands.ImageFilesTransfer.Execution;
 using CameraUtility.Exif;
+using CSharpFunctionalExtensions;
 
-namespace CameraUtility
+namespace CameraUtility.Commands.ImageFilesTransfer
 {
     internal sealed class CameraFileNameConverter
     {
@@ -22,20 +23,24 @@ namespace CameraUtility
             _fileSystem = fileSystem;
         }
 
-        internal (string destinationDirectory, string destinationFileName) Convert(
+        internal Result<(string destinationDirectory, string destinationFileName)> Convert(
             CameraFileTransferer.Args args)
         {
             var (cameraFilePath, destinationRootDirectory, _, skipDateSubdirectoryOption) = args;
-            var cameraFile = GetCameraFile(cameraFilePath);
+            var cameraFileResult = GetCameraFile(cameraFilePath);
+            if (cameraFileResult.IsFailure)
+            {
+                return Result.Failure<(string, string)>(cameraFileResult.Error);
+            }
             var destinationDirectory =
-                GetDestinationDirectory(destinationRootDirectory, cameraFile, skipDateSubdirectoryOption);
-            var destinationFileName = GetDestinationFileName(cameraFile);
+                GetDestinationDirectory(destinationRootDirectory, cameraFileResult.Value, skipDateSubdirectoryOption);
+            var destinationFileName = GetDestinationFileName(cameraFileResult.Value);
 
             return (destinationDirectory, destinationFileName);
         }
 
-        private ICameraFile GetCameraFile(
-            string cameraFilePath)
+        private Result<ICameraFile> GetCameraFile(
+            CameraFilePath cameraFilePath)
         {
             var metadataTags = _metadataReader.ExtractTags(cameraFilePath);
             return _cameraFileFactory.Create(cameraFilePath, metadataTags);

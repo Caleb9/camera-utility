@@ -2,9 +2,9 @@
 
 namespace CameraUtility.CameraFiles
 {
-    public interface ICameraFile
+    internal interface ICameraFile
     {
-        string FullName { get; }
+        CameraFilePath FullName { get; }
         string Extension { get; }
         DateTime Created { get; }
 

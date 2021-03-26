@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using CameraUtility.Exif;
+using CSharpFunctionalExtensions;
 
 namespace CameraUtility.CameraFiles
 {
     /// <summary>
     ///     Jpeg (Android and Canon) or Cr2 raw Canon photo.
     /// </summary>
-    public sealed class ImageFile
+    internal sealed class ImageFile
         : AbstractCameraFile, ICameraFile
     {
         /// <summary>
@@ -24,46 +25,73 @@ namespace CameraUtility.CameraFiles
 
         private const int SubSecondTagType = 0x9291;
 
-        public ImageFile(string fullName, IEnumerable<ITag> exifTags)
+        private ImageFile(
+            CameraFilePath fullName,
+            DateTime created)
             : base(fullName)
         {
-            var enumeratedExifTags = exifTags.ToList();
-            var dateTimeOriginal = FindCreatedDateTimeTag(enumeratedExifTags);
-            Created =
-                ParseCreatedDateTime(dateTimeOriginal)
-                    .AddMilliseconds(FindSubSeconds(enumeratedExifTags));
+            Created = created;
         }
 
         public override DateTime Created { get; }
         public override string DestinationNamePrefix => "IMG_";
 
-        private ITag FindCreatedDateTimeTag(
+        internal static Result<ICameraFile> Create(
+            CameraFilePath fullName,
+            IEnumerable<ITag> exifTags)
+        {
+            var enumeratedExifTags = exifTags.ToList();
+            var dateTimeOriginalResult = FindCreatedDateTimeTag(enumeratedExifTags);
+            if (dateTimeOriginalResult.IsFailure)
+            {
+                return Result.Failure<ICameraFile>(dateTimeOriginalResult.Error);
+            }
+            var parsedDateTimeResult = ParseCreatedDateTime(dateTimeOriginalResult.Value);
+            if (parsedDateTimeResult.IsFailure)
+            {
+                return Result.Failure<ICameraFile>(parsedDateTimeResult.Error);
+            }
+
+            return new ImageFile(
+                fullName,
+                parsedDateTimeResult.Value.AddMilliseconds(FindSubSeconds(enumeratedExifTags)));
+        }
+
+        private static Result<ITag> FindCreatedDateTimeTag(
             IList<ITag> exifTags)
         {
-            // TODO InvalidOperationException is not very meaningful for the user. Introduce a factory method and return
-            // Result
-            return exifTags.FirstOrDefault(t => t.Type == DateTimeOriginalTagType)
-                   /* Try fallback tag, if not found then an exception will be thrown */
-                   ?? exifTags.First(t => t.Type == FallbackDateTimeTagType);
+            var tag = exifTags.FirstOrDefault(t => t.Type == DateTimeOriginalTagType)
+                      /* Try fallback tag, if not found then an exception will be thrown */
+                      ?? exifTags.FirstOrDefault(t => t.Type == FallbackDateTimeTagType);
+            return
+                tag is not null
+                    ? Result.Success(tag)
+                    : Result.Failure<ITag>("Metadata not found");
         }
 
-        private DateTime ParseCreatedDateTime(
+        private static Result<DateTime> ParseCreatedDateTime(
             ITag dateTimeOriginal)
         {
-            return DateTime.ParseExact(
+            if (DateTime.TryParseExact(
                 dateTimeOriginal.Value,
                 "yyyy:MM:dd HH:mm:ss",
-                CultureInfo.InvariantCulture);
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var parsedDateTime))
+            {
+                return parsedDateTime;
+            }
+            return Result.Failure<DateTime>("Invalid metadata");
         }
 
-        private int FindSubSeconds(
+        private static int FindSubSeconds(
             IEnumerable<ITag> exifTags)
         {
             var subSeconds = exifTags.FirstOrDefault(t => t.Type == SubSecondTagType);
             return subSeconds is null ? 0 : ToMilliseconds(int.Parse(subSeconds.Value));
         }
 
-        private int ToMilliseconds(
+        private static int ToMilliseconds(
             int subSeconds)
         {
             return subSeconds * 10;

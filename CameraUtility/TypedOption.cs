@@ -1,11 +1,12 @@
-namespace CameraUtility.Commands.ImageFilesTransfer.Options
+namespace CameraUtility
 {
-    internal abstract record TypeWrapper<T>(T Value)
+    public abstract record TypedOption<T>(
+        T Value)
     {
         public static implicit operator T(
-            TypeWrapper<T> dryRun)
+            TypedOption<T> typedOption)
         {
-            return dryRun.Value;
+            return typedOption.Value;
         }
 
         public override string ToString()

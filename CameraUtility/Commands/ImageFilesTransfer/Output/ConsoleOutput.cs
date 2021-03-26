@@ -3,14 +3,13 @@ using System.IO;
 
 namespace CameraUtility.Commands.ImageFilesTransfer.Output
 {
-    internal sealed class ConsoleOutput
+    internal sealed class ConsoleOutput :
+        ConsoleOutputBase
     {
-        private readonly TextWriter _textWriter;
-
         internal ConsoleOutput(
             TextWriter textWriter)
+        : base(textWriter)
         {
-            _textWriter = textWriter;
         }
 
         internal void HandleError(
@@ -59,26 +58,6 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Output
             WriteLine(
                 $"Failed {sourcePath}: {exception.Message}",
                 ConsoleColor.Red);
-        }
-
-        private void WriteLine(
-            string line,
-            ConsoleColor? color = default)
-        {
-            var currentColor = Console.ForegroundColor;
-            try
-            {
-                if (color.HasValue)
-                {
-                    Console.ForegroundColor = color.Value;
-                }
-
-                _textWriter.WriteLine(line);
-            }
-            finally
-            {
-                Console.ForegroundColor = currentColor;
-            }
         }
     }
 }

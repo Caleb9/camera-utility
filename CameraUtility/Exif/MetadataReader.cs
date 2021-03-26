@@ -8,7 +8,7 @@ namespace CameraUtility.Exif
 {
     internal sealed class MetadataReader : IMetadataReader
     {
-        IEnumerable<ITag> IMetadataReader.ExtractTags(string filePath)
+        IEnumerable<ITag> IMetadataReader.ExtractTags(CameraFilePath filePath)
         {
             return ImageMetadataReader.ReadMetadata(filePath)
                 .SelectMany(tagDirectory => tagDirectory.Tags)

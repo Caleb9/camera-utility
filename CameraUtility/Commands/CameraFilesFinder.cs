@@ -6,7 +6,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using CSharpFunctionalExtensions;
 
-namespace CameraUtility
+namespace CameraUtility.Commands
 {
     internal sealed class CameraFilesFinder
     {
@@ -30,15 +30,19 @@ namespace CameraUtility
 
         internal event EventHandler<long> OnCameraFilesFound = (_, _) => { };
 
-        internal Result<IEnumerable<string>> FindCameraFiles(
+        internal Result<IEnumerable<CameraFilePath>> FindCameraFiles(
             string path)
         {
             if (_fileSystem.Directory.Exists(path) is false && _fileSystem.File.Exists(path) is false)
             {
-                return Result.Failure<IEnumerable<string>>($"{path} does not exist.");
+                return Result.Failure<IEnumerable<CameraFilePath>>($"{path} does not exist.");
             }
 
-            var result = FindFilePaths(path).Where(IsCameraFile).AsParallel().ToList();
+            var result =
+                FindFilePaths(path)
+                    .Where(IsCameraFile)
+                    .Select(s => new CameraFilePath(s))
+                    .ToList();
             OnCameraFilesFound(this, result.Count);
             return result;
         }

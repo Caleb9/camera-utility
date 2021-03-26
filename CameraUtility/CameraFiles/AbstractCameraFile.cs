@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using CameraUtility.Utils;
 
 namespace CameraUtility.CameraFiles
 {
     [DebuggerDisplay("{FullName} {Created}")]
-    public abstract class AbstractCameraFile : ICameraFile
+    internal abstract class AbstractCameraFile : ICameraFile
     {
-        protected AbstractCameraFile(string fullName)
+        protected AbstractCameraFile(
+            CameraFilePath fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName))
             {
@@ -15,14 +15,14 @@ namespace CameraUtility.CameraFiles
             }
 
             FullName = fullName;
-            Extension = FileNameUtil.GetExtension(fullName);
+            Extension = fullName.GetExtension();
             if (string.IsNullOrWhiteSpace(Extension))
             {
                 throw new ArgumentException($"File {fullName} has no extension", nameof(fullName));
             }
         }
 
-        public string FullName { get; }
+        public CameraFilePath FullName { get; }
         public string Extension { get; }
         public abstract DateTime Created { get; }
         public abstract string DestinationNamePrefix { get; }

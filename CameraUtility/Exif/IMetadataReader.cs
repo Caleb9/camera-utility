@@ -10,6 +10,7 @@ namespace CameraUtility.Exif
         /// <summary>
         ///     Returns all tags found in file's Exif metadata.
         /// </summary>
-        IEnumerable<ITag> ExtractTags(string filePath);
+        IEnumerable<ITag> ExtractTags(
+            CameraFilePath filePath);
     }
 }

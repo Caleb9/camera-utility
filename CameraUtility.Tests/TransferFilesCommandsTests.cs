@@ -10,6 +10,7 @@ using CameraUtility.Exif;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using static CameraUtility.Tests.Helpers;
 
 namespace CameraUtility.Tests
 {
@@ -17,39 +18,7 @@ namespace CameraUtility.Tests
     {
         private const string SourceDirPath = "/source/directory";
         private const string DestinationDirPath = "/destination/directory";
-
-        private static IEnumerable<ITag> NewImageFileTags(
-            string createdDateOriginal,
-            string subSeconds)
-        {
-            return new[]
-            {
-                NewCreatedDateTimeOriginalTag(createdDateOriginal),
-                NewSubSecondsTag(subSeconds)
-            };
-
-            static ITag NewCreatedDateTimeOriginalTag(string value)
-            {
-                return Mock.Of<ITag>(t =>
-                    t.Directory == "Exif SubIFD" && t.Type == 0x9003 && t.Value == value);
-            }
-
-            static ITag NewSubSecondsTag(string value)
-            {
-                return Mock.Of<ITag>(t =>
-                    t.Directory == "Exif SubIFD" && t.Type == 0x9291 && t.Value == value);
-            }
-        }
-
-        private static IEnumerable<ITag> NewQuickTimeFileTags(string value)
-        {
-            return new[]
-            {
-                Mock.Of<ITag>(t =>
-                    t.Directory == "QuickTime Movie Header" && t.Type == 0x3 && t.Value == value)
-            };
-        }
-
+        
         public sealed class WithDateSubdirectory
         {
             private static readonly IEnumerable<(
@@ -325,10 +294,10 @@ namespace CameraUtility.Tests
                             new[] {$"{SourceDirPath}/IMG_1234.JPG", $"{SourceDirPath}/IMG_4231.JPEG"});
                 var metadataReader = fixture.Freeze<Mock<IMetadataReader>>();
                 metadataReader
-                    .Setup(mr => mr.ExtractTags($"{SourceDirPath}/IMG_1234.JPG"))
+                    .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_1234.JPG")))
                     .Throws(new Exception("PROCESSING EXCEPTION"));
                 metadataReader
-                    .Setup(mr => mr.ExtractTags($"{SourceDirPath}/IMG_4231.JPEG"))
+                    .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_4231.JPEG")))
                     .Returns(NewImageFileTags("2011:02:13 14:15:16", "43"));
 
                 var consoleTextWriterMock = new StringWriter();
@@ -366,10 +335,10 @@ namespace CameraUtility.Tests
                             new[] {$"{SourceDirPath}/IMG_1234.JPG", $"{SourceDirPath}/IMG_4231.JPEG"});
                 var metadataReaderStub = fixture.Freeze<Mock<IMetadataReader>>();
                 metadataReaderStub
-                    .Setup(mr => mr.ExtractTags($"{SourceDirPath}/IMG_1234.JPG"))
+                    .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_1234.JPG")))
                     .Throws(new Exception("PROCESSING EXCEPTION"));
                 metadataReaderStub
-                    .Setup(mr => mr.ExtractTags($"{SourceDirPath}/IMG_4231.JPEG"))
+                    .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_4231.JPEG")))
                     .Returns(NewImageFileTags("2011:02:13 14:15:16", "43"));
 
                 var consoleTextWriterMock = new StringWriter();
@@ -421,10 +390,10 @@ namespace CameraUtility.Tests
                 fixture.Inject(cancellationTokenSource);
                 var metadataReaderStub = fixture.Freeze<Mock<IMetadataReader>>();
                 metadataReaderStub
-                    .Setup(mr => mr.ExtractTags($"{SourceDirPath}/IMG_1234.JPG"))
+                    .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_1234.JPG")))
                     .Returns(NewImageFileTags("2010:01:12 13:14:15", "42"));
                 metadataReaderStub
-                    .Setup(mr => mr.ExtractTags($"{SourceDirPath}/IMG_4231.JPEG"))
+                    .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_4231.JPEG")))
                     .Returns(NewImageFileTags("2011:02:13 14:15:16", "43"))
                     /* Simulate pressing Ctrl-C after second file has been processed */
                     .Callback(cancellationTokenSource.Cancel);
@@ -533,52 +502,6 @@ namespace CameraUtility.Tests
                             false));
                 }
             }
-        }
-    }
-
-    internal static class TestExtensions
-    {
-        internal static Mock<IFileSystem> SetupDefaults(
-            this Mock<IFileSystem> fileSystemMock)
-        {
-            fileSystemMock
-                .Setup(fs => fs.Path.Combine(It.IsAny<string>(), It.IsAny<string>()))
-                .Returns<string, string>((s1, s2) => $"{s1}/{s2}");
-            return fileSystemMock;
-        }
-
-        internal static Mock<IFileSystem> SetupSourceDirectoryWithFiles(
-            this Mock<IFileSystem> fileSystemMock,
-            string sourceDirectoryPath,
-            IEnumerable<string> files)
-        {
-            fileSystemMock
-                .Setup(fs => fs.Directory.Exists(sourceDirectoryPath))
-                .Returns(true);
-
-            fileSystemMock
-                .Setup(fs =>
-                    fs.Directory.GetFiles(
-                        sourceDirectoryPath,
-                        It.Is<string>(searchPattern => searchPattern == "*" || searchPattern == string.Empty),
-                        SearchOption.AllDirectories))
-                .Returns(files.ToArray());
-
-            return fileSystemMock;
-        }
-
-        internal static Mock<IMetadataReader> SetupMetadata(
-            this Mock<IMetadataReader> metadataReaderMock,
-            IEnumerable<(string file, IEnumerable<ITag> tags)> filesWithExifMetadata)
-        {
-            foreach (var (file, tags) in filesWithExifMetadata)
-            {
-                metadataReaderMock
-                    .Setup(mr => mr.ExtractTags(file))
-                    .Returns(tags);
-            }
-
-            return metadataReaderMock;
         }
     }
 }

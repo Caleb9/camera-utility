@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using CameraUtility.Exif;
+using CSharpFunctionalExtensions;
 
 namespace CameraUtility.CameraFiles
 {
     /// <summary>
     ///     Raw Android photo.
     /// </summary>
-    public sealed class DngImageFile :
+    internal sealed class DngImageFile :
         AbstractCameraFile, ICameraFile
     {
         /// <summary>
@@ -17,16 +18,33 @@ namespace CameraUtility.CameraFiles
         /// </summary>
         private const int DateTimeOriginalTagType = 0x9003;
 
-        internal DngImageFile(
-            string fullName,
-            IEnumerable<ITag> exifTags)
+        private DngImageFile(
+            CameraFilePath fullName,
+            DateTime created)
             : base(fullName)
         {
-            var dateTimeOriginal = exifTags.First(t => t.Type == DateTimeOriginalTagType);
-            Created = DateTime.ParseExact(
-                dateTimeOriginal.Value,
+            Created = created;
+        }
+
+        internal static Result<ICameraFile> Create(
+            CameraFilePath fullName,
+            IEnumerable<ITag> exifTags)
+        {
+            var dateTimeOriginal = exifTags.FirstOrDefault(t => t.Type == DateTimeOriginalTagType);
+            if (dateTimeOriginal is null)
+            {
+                return Result.Failure<ICameraFile>("Metadata not found");
+            }
+            if (DateTime.TryParseExact(
+                dateTimeOriginal?.Value,
                 "yyyy:MM:dd HH:mm:ss",
-                CultureInfo.InvariantCulture);
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var parsedDateTime))
+            {
+                return new DngImageFile(fullName, parsedDateTime);
+            }
+            return Result.Failure<ICameraFile>("Invalid metadata");
         }
 
         public override DateTime Created { get; }

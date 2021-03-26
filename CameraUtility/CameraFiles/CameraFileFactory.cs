@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using CameraUtility.Exif;
-using CameraUtility.Utils;
+using CSharpFunctionalExtensions;
 
 namespace CameraUtility.CameraFiles
 {
     internal sealed class CameraFileFactory
     {
-        internal ICameraFile Create(string filePath, IEnumerable<ITag> metadata)
+        internal Result<ICameraFile> Create(
+            CameraFilePath filePath,
+            IEnumerable<ITag> metadata)
         {
-            switch (FileNameUtil.GetExtension(filePath).ToLowerInvariant())
+            switch (filePath.GetExtension().ToLowerInvariant())
             {
                 case ".jpg":
                 case ".jpeg":
                 case ".cr2":
-                    return new ImageFile(filePath, metadata);
+                    return ImageFile.Create(filePath, metadata);
                 case ".dng":
-                    return new DngImageFile(filePath, metadata);
+                    return DngImageFile.Create(filePath, metadata);
                 case ".mp4":
                 case ".mov":
-                    return new VideoFile(filePath, metadata);
+                    return VideoFile.Create(filePath, metadata);
                 default:
                     throw new InvalidPathException($"Unknown file type {filePath}");
             }

@@ -69,43 +69,57 @@ Currently camera-util finds files of following types:
 
 ## How to Use
 
-There are two sub commands to use: `copy` and `move`:
+There are three sub-commands to use:
+* `copy` and `move`
+* `check`
 
 ```
-Usage:
-  camera-utility [options] [command]
-
-Options:
-  --version         Show version information
-  -?, -h, --help    Show help and usage information
-
-Commands:
-  copy    Copy files
-  move    Move files
+Usage:                                                                      │
+  camera-utility [options] [command]                                        │
+                                                                            │
+Options:                                                                    │
+  --version         Show version information                                │
+  -?, -h, --help    Show help and usage information                         │
+                                                                            │
+Commands:                                                                   │
+  copy, cp <src-path> <dst-dir>    Copies suppported image and video files  │
+                                   to destination directory and renames     │
+                                   them by date recorded in EXIF metadata.  │
+  move, mv <src-path> <dst-dir>    Moves suppported image and video files   │
+                                   to destination directory and renames     │
+                                   them by date recorded in EXIF metadata.  │
+  c, check <src-paths>             Scans file or directory for supported    │
+                                   image and video files and checks if      │
+                                   EXIF metadata is present. [default: .]
 ```
 
-Both commands take the following options:
+Both `copy` and `move` commands take the following options:
 
 ```
-Options:
-  -s, --src-path <src-path> (REQUIRED)    Path to a camera file (image or video) or a directory containing camera
-                                          files. When a directory is specified, all sub-directories will be
-                                          scanned as well.
-  -d, --dst-dir <dst-dir> (REQUIRED)      Destination directory root path where files will be copied or moved
-                                          into auto-created sub-directories named after file creation date (e.g.
-                                          2019_08_22/), unless --skip-date-subdir option is present.
-  -n, --dry-run                           If present, no actual files will be transferred. The output will
-                                          contain information about source and destination paths.
-  -k, --keep-going                        Try to continue operation when errors for individual files occur.
-  --skip-date-subdir                      Do not create date sub-directories in destination directory.
-  -?, -h, --help                          Show help and usage information
+Arguments:                                                                  │
+  <src-path>    Path to a camera file (image or video) or a directory       │
+                containing camera files. When a directory is specified,     │
+                all sub-directories will be scanned as well.                │
+  <dst-dir>     Destination directory root path where files will be copied  │
+                or moved into auto-created sub-directories named after      │
+                file creation date (e.g. 2019_08_22/), unless               │
+                --skip-date-subdir option is present.                       │
+                                                                            │
+Options:                                                                    │
+  -n, --dry-run         If present, no actual files will be transferred.    │
+                        The output will contain information about source    │
+                        and destination paths.                              │
+  -k, --keep-going      Try to continue operation when errors for           │
+                        individual files occur.                             │
+  --skip-date-subdir    Do not create date sub-directories in destination   │
+                        directory.
 ```
 
-The `--src-path` and `--dst-dir` are the only required
-options. `--dry-run`, `--keep-going` and `--skip-date-subdir` can be
+The `<src-path>` and `<dst-dir>` are the only required
+arguments. `--dry-run`, `--keep-going` and `--skip-date-subdir` can be
 added in any combination.
 
-By default (if `--keep-going` is not used), the application will bail
+By default (when `--keep-going` is not used), the application will bail
 out on first error, e.g. if it cannot read file's EXIF metadata (this
 can happen for pictures taken with old phone for example). It will
 also **not overwrite any existing files**.
@@ -113,25 +127,41 @@ also **not overwrite any existing files**.
 With `--keep-going`, there's a report printed by the end containing
 list of skipped files and those where metadata could not be read.
 
-I'd recommend trying it first with `--dry-run` option to see if all
-the files have valid metadata.
+I'd recommend using the `check` command first to see if all the files
+have valid metadata.
 
 The application is written in .NET Core, I have successfully used in
-on both Windows and Linux.
+on Windows, Linux and macOS.
 
 
 ### Examples
 
+Find all camera files in current directory and check if they contain
+necessary metadata to derive date-based name for `copy` or `move`
+commands:
 ```
-camera-utility copy --src-path /source/directory/path --dst-path /destination/path --dry-run --keep-going
+camera-utility check
 ```
 
+Check a specific directory:
 ```
-camera-utility move --src-path /source/directory/path --dst-path /destination/path --keep-going
+camera-utility check /source/directory/path
 ```
 
+Execute a test run to see how files would be copied and renamed:
 ```
-camera-utility copy --src-path /source/file.jpg --dst-path /destination/path --skip-date-subdir
+camera-utility copy /source/directory/path /destination/path --dry-run --keep-going
+```
+
+Move files and ignore errors for files which don't contain metadata:
+```
+camera-utility move /source/directory/path /destination/path --keep-going
+```
+
+Copy files directly into `/destination/path` without the date
+sub-directory:
+```
+camera-utility copy /source/file.jpg /destination/path --skip-date-subdir
 ```
 
 etc.

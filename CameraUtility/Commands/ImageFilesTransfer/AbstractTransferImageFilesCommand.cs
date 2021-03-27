@@ -13,8 +13,8 @@ namespace CameraUtility.Commands.ImageFilesTransfer
             OptionsHandler handler)
             : base(name, description)
         {
-            AddOption(new SourceOption());
-            AddOption(new DestinationOption());
+            AddArgument(new SourceArgument());
+            AddArgument(new DestinationArgument());
             AddOption(new DryRunOption());
             AddOption(new KeepGoingOption());
             AddOption(new SkipDateSubdirOption());
@@ -32,30 +32,30 @@ namespace CameraUtility.Commands.ImageFilesTransfer
 
         internal delegate int OptionsHandler(OptionArgs options);
 
-        private class SourceOption :
-            Option<string>
+        private class SourceArgument :
+            Argument<string>
         {
-            public SourceOption()
+            public SourceArgument()
                 : base(
-                    new[] {"--src-path", "-s"},
+                    "src-path",
                     "Path to a camera file (image or video) or a directory containing camera files. " +
                     "When a directory is specified, all sub-directories will be scanned as well.")
             {
-                IsRequired = true;
+                Arity = ArgumentArity.ExactlyOne;
             }
         }
 
-        private class DestinationOption :
-            Option<string>
+        private class DestinationArgument :
+            Argument<string>
         {
-            public DestinationOption()
+            public DestinationArgument()
                 : base(
-                    new[] {"--dst-dir", "-d"},
+                    "dst-dir",
                     "Destination directory root path where files will be copied or moved into auto-created " +
                     "sub-directories named after file creation date (e.g. 2019_08_22/), " +
                     "unless --skip-date-subdir option is present.")
             {
-                IsRequired = true;
+                Arity = ArgumentArity.ExactlyOne;
             }
         }
 

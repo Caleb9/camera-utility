@@ -81,7 +81,7 @@ namespace CameraUtility.Tests
                 var sut = fixture.Create<Program>();
 
                 /* Act */
-                var result = sut.Execute($"copy --src-path {SourceDirPath} --dst-dir {DestinationDirPath}".Split());
+                var result = sut.Execute($"copy {SourceDirPath} {DestinationDirPath}".Split());
 
                 /* Assert */
                 result.Should().Be(0);
@@ -131,7 +131,7 @@ namespace CameraUtility.Tests
                 var sut = fixture.Create<Program>();
 
                 /* Act */
-                var result = sut.Execute($"move --src-path {SourceDirPath} --dst-dir {DestinationDirPath}".Split());
+                var result = sut.Execute($"move {SourceDirPath} {DestinationDirPath}".Split());
 
                 /* Assert */
                 result.Should().Be(0);
@@ -193,7 +193,7 @@ namespace CameraUtility.Tests
                 var sut = fixture.Create<Program>();
 
                 /* Act */
-                var result = sut.Execute($"copy --src-path {SourceDirPath} --dst-dir {DestinationDirPath}".Split());
+                var result = sut.Execute($"copy {SourceDirPath} {DestinationDirPath}".Split());
 
                 /* Assert */
                 result.Should().Be(0);
@@ -221,7 +221,7 @@ namespace CameraUtility.Tests
                 fixture.Inject<TextWriter>(consoleTextWriterMock);
                 var sut = fixture.Create<Program>();
 
-                var result = sut.Execute("copy --src-path not-existing --dst-dir output-dir".Split());
+                var result = sut.Execute("copy not-existing output-dir".Split());
 
                 result.Should().NotBe(0);
                 var output = consoleTextWriterMock.ToString();
@@ -250,7 +250,7 @@ namespace CameraUtility.Tests
 
                 /* Act */
                 var result = sut.Execute(
-                    $"{command} --src-path {SourceDirPath} --dst-dir {DestinationDirPath} --dry-run".Split());
+                    $"{command} --dry-run {SourceDirPath} {DestinationDirPath}".Split());
 
                 /* Assert */
                 result.Should().Be(0);
@@ -305,7 +305,7 @@ namespace CameraUtility.Tests
                 var sut = fixture.Create<Program>();
 
                 /* Act */
-                var result = sut.Execute($"copy --src-path {SourceDirPath} --dst-dir {DestinationDirPath}".Split());
+                var result = sut.Execute($"copy {SourceDirPath} {DestinationDirPath}".Split());
 
                 /* Assert */
                 result.Should().NotBe(0);
@@ -347,7 +347,7 @@ namespace CameraUtility.Tests
 
                 /* Act */
                 var result = sut.Execute(
-                    $"copy --src-path {SourceDirPath} --dst-dir {DestinationDirPath} --keep-going".Split());
+                    $"copy {SourceDirPath} {DestinationDirPath} --keep-going".Split());
 
                 /* Assert */
                 result.Should().NotBe(0);
@@ -403,7 +403,7 @@ namespace CameraUtility.Tests
                 var sut = fixture.Create<Program>();
 
                 /* Act */
-                var result = sut.Execute($"copy --src-path {SourceDirPath} --dst-dir {DestinationDirPath}".Split());
+                var result = sut.Execute($"copy {SourceDirPath} {DestinationDirPath}".Split());
 
                 /* Assert */
                 result.Should().NotBe(0);
@@ -471,7 +471,7 @@ namespace CameraUtility.Tests
 
                 /* Act */
                 var result = sut.Execute(
-                    $"copy --src-path {SourceDirPath} --dst-dir {DestinationDirPath} --skip-date-subdir".Split());
+                    $"copy {SourceDirPath} {DestinationDirPath} --skip-date-subdir".Split());
 
                 /* Assert */
                 result.Should().Be(0);

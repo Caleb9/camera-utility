@@ -36,7 +36,7 @@ namespace CameraUtility.CameraFiles
                 return Result.Failure<ICameraFile>("Metadata not found");
             }
             if (DateTime.TryParseExact(
-                dateTimeOriginal?.Value,
+                dateTimeOriginal.Value,
                 "yyyy:MM:dd HH:mm:ss",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,

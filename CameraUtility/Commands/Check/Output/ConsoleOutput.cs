@@ -38,7 +38,7 @@ namespace CameraUtility.Commands.Check.Output
             }
 
             WriteLine(
-                $" Missing metadata in {cameraFilesCounter - cameraFilesWithoutMetadata.Count} file(s).",
+                $" Missing metadata in {cameraFilesWithoutMetadata.Count} file(s).",
                 ConsoleColor.Red);
             WriteLine("Following files are missing metadata:");
             foreach (var cameraFile in cameraFilesWithoutMetadata)

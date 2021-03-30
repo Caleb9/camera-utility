@@ -72,6 +72,9 @@ namespace CameraUtility.Tests
                     NewImageFileTags("2010:01:12 13:14:15", "42")),
                 (
                     $"{sourceDirPath}/IMG_2345.JPEG",
+                    Array.Empty<ITag>()),
+                (
+                    $"{sourceDirPath}/IMG_3456.jpg",
                     Array.Empty<ITag>())
             };
             SetupFileSystemStub(fixture, sourceDirPath, sourceFiles.Select(f => f.sourceFile));
@@ -86,9 +89,10 @@ namespace CameraUtility.Tests
             result.Should().Be(0);
             var output = consoleTextWriterMock.ToString();
             output.Should().Be(
-                "Found 2 camera file(s). Missing metadata in 1 file(s).\n" +
+                "Found 3 camera file(s). Missing metadata in 2 file(s).\n" +
                 "Following files are missing metadata:\n" +
-                $"{sourceDirPath}/IMG_2345.JPEG\n");
+                $"{sourceDirPath}/IMG_2345.JPEG\n" +
+                $"{sourceDirPath}/IMG_3456.jpg\n");
         }
 
         [Fact]

@@ -62,13 +62,13 @@ namespace CameraUtility
                     cameraFileCopier,
                     _cancellationTokenSource.Token);
             internalCopyingOrchestrator.OnError +=
-                (_, error) => consoleOutput.HandleError(error);
+                (_, args) => consoleOutput.HandleError(args.filePath, args.error);
+            internalCopyingOrchestrator.OnError +=
+                (_, args) => report.AddErrorForFile(args.filePath, args.error);
             internalCopyingOrchestrator.OnException +=
                 (_, args) => consoleOutput.HandleException(args.filePath, args.exception);
             internalCopyingOrchestrator.OnException +=
                 (_, args) => report.AddExceptionForFile(args.filePath, args.exception);
-            internalCopyingOrchestrator.OnException +=
-                (_, _) => report.IncrementProcessed();
             IOrchestrator copyingOrchestrator =
                 new ReportingOrchestratorDecorator(
                     internalCopyingOrchestrator,
@@ -87,13 +87,13 @@ namespace CameraUtility
                     cameraFileMover,
                     _cancellationTokenSource.Token);
             internalMovingOrchestrator.OnError +=
-                (_, error) => consoleOutput.HandleError(error);
+                (_, args) => consoleOutput.HandleError(args.filePath, args.error);
+            internalMovingOrchestrator.OnError +=
+                (_, args) => report.AddErrorForFile(args.filePath, args.error);
             internalMovingOrchestrator.OnException +=
                 (_, args) => consoleOutput.HandleException(args.filePath, args.exception);
             internalMovingOrchestrator.OnException +=
                 (_, args) => report.AddExceptionForFile(args.filePath, args.exception);
-            internalMovingOrchestrator.OnException +=
-                (_, _) => report.IncrementProcessed();
             IOrchestrator movingOrchestrator =
                 new ReportingOrchestratorDecorator(
                     internalMovingOrchestrator,
@@ -119,10 +119,6 @@ namespace CameraUtility
                     (_, args) => consoleOutput.HandleFileSkipped(args.sourceFile, args.destinationFile);
                 cameraFileTransferer.OnFileSkipped +=
                     (_, args) => report.AddSkippedFile(args.sourceFile, args.destinationFile);
-                cameraFileTransferer.OnFileSkipped +=
-                    (_, _) => report.IncrementProcessed();
-                cameraFileTransferer.OnFileTransferred +=
-                    (_, _) => report.IncrementProcessed();
                 cameraFileTransferer.OnFileTransferred +=
                     (_, args) => report.IncrementTransferred(args.dryRun);
             }

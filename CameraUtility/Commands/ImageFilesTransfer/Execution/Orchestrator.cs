@@ -27,7 +27,7 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
             var cameraFilePathsResult = _cameraFilesFinder.FindCameraFiles(args.SourcePath);
             if (cameraFilePathsResult.IsFailure)
             {
-                OnError(this, cameraFilePathsResult.Error);
+                OnError(this, (null, cameraFilePathsResult.Error));
                 return ErrorResultCode;
             }
 
@@ -43,7 +43,7 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
                                 cameraFilePath, args.DestinationDirectory, args.DryRun, args.SkipDateSubdirectory));
                     if (transferResult.IsFailure)
                     {
-                        OnError(this, transferResult.Error);
+                        OnError(this, (cameraFilePath, transferResult.Error));
                         if (!args.KeepGoing)
                         {
                             return ErrorResultCode;
@@ -62,7 +62,7 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
             return result;
         }
 
-        internal event EventHandler<string> OnError = (_, _) => { };
+        internal event EventHandler<(CameraFilePath? filePath, string error)> OnError = (_, _) => { };
 
         internal event EventHandler<(CameraFilePath filePath, Exception exception)> OnException = (_, _) => { };
     }

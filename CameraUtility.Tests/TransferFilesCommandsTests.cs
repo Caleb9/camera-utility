@@ -322,7 +322,7 @@ namespace CameraUtility.Tests
             }
 
             [Fact]
-            public void Errors_dont_stop_execution_in_keep_going_mode()
+            public void Errors_do_not_stop_execution_in_keep_going_mode()
             {
                 /* Arrange */
                 var fixture = new Fixture().Customize(new AutoMoqCustomization());
@@ -332,13 +332,21 @@ namespace CameraUtility.Tests
                         .SetupDefaults()
                         .SetupSourceDirectoryWithFiles(
                             SourceDirPath,
-                            new[] {$"{SourceDirPath}/IMG_1234.JPG", $"{SourceDirPath}/IMG_4231.JPEG"});
+                            new[]
+                            {
+                                $"{SourceDirPath}/IMG_1234.JPG",
+                                $"{SourceDirPath}/IMG_2345.jpg",
+                                $"{SourceDirPath}/IMG_3456.JPEG"
+                            });
                 var metadataReaderStub = fixture.Freeze<Mock<IMetadataReader>>();
                 metadataReaderStub
                     .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_1234.JPG")))
                     .Throws(new Exception("PROCESSING EXCEPTION"));
                 metadataReaderStub
-                    .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_4231.JPEG")))
+                    .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_2345.jpg")))
+                    .Returns(Array.Empty<ITag>());
+                metadataReaderStub
+                    .Setup(mr => mr.ExtractTags(new CameraFilePath($"{SourceDirPath}/IMG_3456.JPEG")))
                     .Returns(NewImageFileTags("2011:02:13 14:15:16", "43"));
 
                 var consoleTextWriterMock = new StringWriter();
@@ -354,21 +362,26 @@ namespace CameraUtility.Tests
                 var output = consoleTextWriterMock.ToString();
                 output.Should().Be(
                     $"Failed {SourceDirPath}/IMG_1234.JPG: PROCESSING EXCEPTION\n" +
+                    $"Failed {SourceDirPath}/IMG_2345.jpg: Metadata not found\n" +
                     $"Created {DestinationDirPath}/2011_02_13\n" +
-                    $"{SourceDirPath}/IMG_4231.JPEG -> {DestinationDirPath}/2011_02_13/IMG_20110213_141516430.JPEG\n\n" +
+                    $"{SourceDirPath}/IMG_3456.JPEG -> {DestinationDirPath}/2011_02_13/IMG_20110213_141516430.JPEG\n\n" +
                     "Following errors occurred:\n" +
-                    $"{SourceDirPath}/IMG_1234.JPG: PROCESSING EXCEPTION\n\n" +
-                    "Found 2 camera files. Processed 2. Skipped 0. Transferred 1.\n");
+                    $"{SourceDirPath}/IMG_1234.JPG: PROCESSING EXCEPTION\n" +
+                    $"{SourceDirPath}/IMG_2345.jpg: Metadata not found\n\n" +
+                    "Found 3 camera files. Processed 3. Skipped 0. Transferred 1.\n");
                 fileSystemMock.Verify(fs =>
                         fs.File.Copy($"{SourceDirPath}/IMG_1234.JPG", It.IsAny<string>(), It.IsAny<bool>()),
                     Times.Never);
                 fileSystemMock.Verify(fs =>
+                        fs.File.Copy($"{SourceDirPath}/IMG_2345.jpg", It.IsAny<string>(), It.IsAny<bool>()),
+                    Times.Never);
+                fileSystemMock.Verify(fs =>
                     fs.File.Copy(
-                        $"{SourceDirPath}/IMG_4231.JPEG",
+                        $"{SourceDirPath}/IMG_3456.JPEG",
                         $"{DestinationDirPath}/2011_02_13/IMG_20110213_141516430.JPEG",
                         false));
             }
-
+            
             [Fact]
             public void Cancellation_stops_execution_and_prints_summary()
             {

@@ -13,11 +13,14 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Output
         }
 
         internal void HandleError(
+            CameraFilePath? sourceCameraFilePath,
             string error)
         {
-            WriteLine(
-                error,
-                ConsoleColor.Red);
+            var message =
+                sourceCameraFilePath is not null
+                    ? $"Failed {sourceCameraFilePath}: {error}"
+                    : error;
+            WriteLine(message, ConsoleColor.Red);
         }
 
         internal void HandleCreatedDirectory(
@@ -29,22 +32,22 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Output
         }
 
         internal void HandleFileCopied(
-            string sourcePath,
-            string destinationPath)
+            CameraFilePath sourcePath,
+            CameraFilePath destinationPath)
         {
             WriteLine($"{sourcePath} -> {destinationPath}");
         }
 
         internal void HandleFileMoved(
-            string sourcePath,
-            string destinationPath)
+            CameraFilePath sourcePath,
+            CameraFilePath destinationPath)
         {
             WriteLine($"{sourcePath} -> {destinationPath}");
         }
 
         internal void HandleFileSkipped(
-            string sourcePath,
-            string destinationPath)
+            CameraFilePath sourcePath,
+            CameraFilePath destinationPath)
         {
             WriteLine(
                 $"Skipped {sourcePath} ({destinationPath} already exists)",
@@ -52,11 +55,11 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Output
         }
 
         internal void HandleException(
-            string sourcePath,
+            CameraFilePath sourceCameraFilePath,
             Exception exception)
         {
             WriteLine(
-                $"Failed {sourcePath}: {exception.Message}",
+                $"Failed {sourceCameraFilePath}: {exception.Message}",
                 ConsoleColor.Red);
         }
     }

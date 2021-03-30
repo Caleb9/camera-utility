@@ -9,7 +9,7 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Output
 {
     internal sealed class Report
     {
-        private readonly HashSet<(string source, string destination)> _cameraFilesSkipped = new();
+        private readonly HashSet<(CameraFilePath source, CameraFilePath destination)> _cameraFilesSkipped = new();
         private readonly List<string> _errors = new();
         private readonly TextWriter _textWriter;
         private long _cameraFilesFound;
@@ -29,11 +29,6 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Output
             _cameraFilesFound = count;
         }
 
-        internal void IncrementProcessed()
-        {
-            _cameraFilesProcessed++;
-        }
-
         internal void IncrementTransferred(
             DryRun dryRun)
         {
@@ -41,20 +36,35 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Output
             {
                 _cameraFilesTransferred++;
             }
+            _cameraFilesProcessed++;
         }
 
         internal void AddSkippedFile(
-            string sourceFileName,
-            string destinationFileName)
+            CameraFilePath sourceFileName,
+            CameraFilePath destinationFileName)
         {
             _cameraFilesSkipped.Add((sourceFileName, destinationFileName));
+            _cameraFilesProcessed++;
         }
 
         internal void AddExceptionForFile(
-            string fileName,
+            CameraFilePath cameraFilePath,
             Exception exception)
         {
-            _errors.Add($"{fileName}: {exception.Message}");
+            _errors.Add($"{cameraFilePath}: {exception.Message}");
+            _cameraFilesProcessed++;
+        }
+        
+        internal void AddErrorForFile(
+            CameraFilePath? cameraFilePath,
+            string error)
+        {
+            if (cameraFilePath is null)
+            {
+                return;
+            }
+            _errors.Add($"{cameraFilePath}: {error}");
+            _cameraFilesProcessed++;
         }
 
         internal void PrintReport(

@@ -10,7 +10,7 @@ namespace CameraUtility.CameraFiles
     /// <summary>
     ///     Jpeg (Android and Canon) or Cr2 raw Canon photo.
     /// </summary>
-    internal sealed class ImageFile
+    public sealed class ImageFile
         : AbstractCameraFile, ICameraFile
     {
         /// <summary>
@@ -19,11 +19,11 @@ namespace CameraUtility.CameraFiles
         private const int DateTimeOriginalTagType = 0x9003;
 
         /// <summary>
-        ///     Some older cameras don't use the 0x9003. We will try to read it from 0x0132 tag.
+        ///     Some older cameras don't use the 0x9003. We will try to read it from 0x0132 tag (ModifyDate).
         /// </summary>
         private const int FallbackDateTimeTagType = 0x0132;
 
-        private const int SubSecondTagType = 0x9291;
+        private const int SubSecTimeOriginalTagType = 0x9291;
 
         private ImageFile(
             CameraFilePath fullName,
@@ -36,7 +36,7 @@ namespace CameraUtility.CameraFiles
         public override DateTime Created { get; }
         public override string DestinationNamePrefix => "IMG_";
 
-        internal static Result<ICameraFile> Create(
+        public static Result<ICameraFile> Create(
             CameraFilePath fullName,
             IEnumerable<ITag> exifTags)
         {
@@ -54,14 +54,13 @@ namespace CameraUtility.CameraFiles
 
             return new ImageFile(
                 fullName,
-                parsedDateTimeResult.Value.AddMilliseconds(FindSubSeconds(enumeratedExifTags)));
+                parsedDateTimeResult.Value.Add(FindSubSeconds(enumeratedExifTags)));
         }
 
         private static Result<ITag> FindCreatedDateTimeTag(
             IList<ITag> exifTags)
         {
             var tag = exifTags.FirstOrDefault(t => t.Type == DateTimeOriginalTagType)
-                      /* Try fallback tag, if not found then an exception will be thrown */
                       ?? exifTags.FirstOrDefault(t => t.Type == FallbackDateTimeTagType);
             return
                 tag is not null
@@ -84,17 +83,28 @@ namespace CameraUtility.CameraFiles
             return Result.Failure<DateTime>("Invalid metadata");
         }
 
-        private static int FindSubSeconds(
+        private static TimeSpan FindSubSeconds(
             IEnumerable<ITag> exifTags)
         {
-            var subSeconds = exifTags.FirstOrDefault(t => t.Type == SubSecondTagType);
-            return subSeconds is null ? 0 : ToMilliseconds(int.Parse(subSeconds.Value));
+            var subSeconds = exifTags.FirstOrDefault(t => t.Type == SubSecTimeOriginalTagType);
+            return subSeconds is null ? TimeSpan.Zero : ToMilliseconds(subSeconds.Value);
         }
 
-        private static int ToMilliseconds(
-            int subSeconds)
+        /// <summary>
+        ///     EXIF specifies that SubSecOriginal tag contains "fractions" of a second. Depending on length of the
+        ///     value a different fractional unit can be used, e.g. "042" is 42 milliseconds (0.042 of a second) but
+        ///     "42" is 420 milliseconds (0.42 of a second).
+        /// </summary>
+        private static TimeSpan ToMilliseconds(
+            string subSeconds)
         {
-            return subSeconds * 10;
+            if (int.TryParse(subSeconds, out var tagIntValue) is false)
+            {
+                return TimeSpan.Zero;
+            }
+            var subSecondDenominator = Math.Pow(10, subSeconds.Trim().Length);
+            var millisecondMultiplier = 1000 / subSecondDenominator;
+            return TimeSpan.FromMilliseconds(tagIntValue * millisecondMultiplier);
         }
     }
 }

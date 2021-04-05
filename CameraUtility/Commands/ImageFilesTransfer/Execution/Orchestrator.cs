@@ -53,7 +53,10 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
                 catch (Exception exception)
                 {
                     OnException(this, (cameraFilePath, exception));
-                    if (!args.KeepGoing) return ErrorResultCode;
+                    if (!args.KeepGoing)
+                    {
+                        return ErrorResultCode;
+                    }
 
                     result = ErrorResultCode;
                 }

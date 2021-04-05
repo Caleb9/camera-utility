@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace CameraUtility.CameraFiles
 {
     [DebuggerDisplay("{FullName} {Created}")]
-    internal abstract class AbstractCameraFile : ICameraFile
+    public abstract class AbstractCameraFile
     {
         protected AbstractCameraFile(
             CameraFilePath fullName)

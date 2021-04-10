@@ -118,13 +118,13 @@ Options:                                                                    │
 ```
 
 The `<src-path>` and `<dst-dir>` are the only required
-arguments. `--dry-run`, `--keep-going` and `--skip-date-subdir` can be
-added in any combination.
+arguments. Remaining options can be added in any combination.
 
-By default (when `--keep-going` is not used), the application will bail
-out on first error, e.g. if it cannot read file's EXIF metadata (this
-can happen for pictures taken with old phone for example). It will
-also **not overwrite any existing files**.
+By default (when `--keep-going` is not used), the application will
+bail out on first error, e.g. if it cannot read file's EXIF metadata
+(this can happen for pictures taken with old phone for example). It
+will also **not overwrite any existing files**, unless `--overwrite`
+option is used.
 
 With `--keep-going`, there's a report printed by the end containing
 list of skipped files and those where metadata could not be read.

@@ -32,7 +32,8 @@ namespace CameraUtility.Tests
                     fs.Directory.GetFiles(
                         sourceDirectoryPath,
                         It.Is<string>(searchPattern => searchPattern == "*" || searchPattern == string.Empty),
-                        SearchOption.AllDirectories))
+                        It.Is<EnumerationOptions>(options =>
+                            options.RecurseSubdirectories && options.IgnoreInaccessible)))
                 .Returns(files.ToArray());
 
             return fileSystemMock;

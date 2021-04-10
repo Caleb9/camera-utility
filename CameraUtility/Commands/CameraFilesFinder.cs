@@ -50,8 +50,14 @@ namespace CameraUtility.Commands
         private IEnumerable<string> FindFilePaths(
             string path)
         {
+            var enumerationOptions =
+                new EnumerationOptions
+                {
+                    RecurseSubdirectories = true,
+                    IgnoreInaccessible = true
+                };
             return _fileSystem.Directory.Exists(path)
-                ? _fileSystem.Directory.GetFiles(path, "*", SearchOption.AllDirectories)
+                ? _fileSystem.Directory.GetFiles(path, "*", enumerationOptions)
                 : new[] {path};
         }
 

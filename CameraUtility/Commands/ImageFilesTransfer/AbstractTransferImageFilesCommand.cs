@@ -18,16 +18,18 @@ namespace CameraUtility.Commands.ImageFilesTransfer
             AddOption(new DryRunOption());
             AddOption(new KeepGoingOption());
             AddOption(new SkipDateSubdirOption());
+            AddOption(new OverwriteOption());
 
-            Handler = CommandHandler.Create<string, string, bool, bool, bool>(
-                (srcPath, dstDir, dryRun, keepGoing, skipDateSubdir) =>
+            Handler = CommandHandler.Create<string, string, bool, bool, bool, bool>(
+                (srcPath, dstDir, dryRun, keepGoing, skipDateSubdir, overwrite) =>
                     handler(
                         new OptionArgs(
                             new SourcePath(srcPath),
                             new DestinationDirectory(dstDir),
                             new DryRun(dryRun),
                             new KeepGoing(keepGoing),
-                            new SkipDateSubdirectory(skipDateSubdir))));
+                            new SkipDateSubdirectory(skipDateSubdir),
+                            new Overwrite(overwrite))));
         }
 
         internal delegate int OptionsHandler(OptionArgs options);
@@ -92,12 +94,24 @@ namespace CameraUtility.Commands.ImageFilesTransfer
             {
             }
         }
+        
+        private class OverwriteOption :
+            Option<bool>
+        {
+            public OverwriteOption()
+                : base(
+                    "--overwrite",
+                    "Transfer files even if they already exist in destination.")
+            {
+            }
+        }
 
         internal sealed record OptionArgs(
             SourcePath SourcePath,
             DestinationDirectory DestinationDirectory,
             DryRun DryRun,
             KeepGoing KeepGoing,
-            SkipDateSubdirectory SkipDateSubdirectory);
+            SkipDateSubdirectory SkipDateSubdirectory,
+            Overwrite Overwrite);
     }
 }

@@ -40,7 +40,11 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
                     var transferResult =
                         _cameraFileTransferer.TransferFile(
                             new CameraFileTransferer.Args(
-                                cameraFilePath, args.DestinationDirectory, args.DryRun, args.SkipDateSubdirectory));
+                                cameraFilePath,
+                                args.DestinationDirectory,
+                                args.DryRun,
+                                args.SkipDateSubdirectory,
+                                args.Overwrite));
                     if (transferResult.IsFailure)
                     {
                         OnError(this, (cameraFilePath, transferResult.Error));

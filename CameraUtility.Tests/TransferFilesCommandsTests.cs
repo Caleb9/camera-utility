@@ -96,7 +96,7 @@ namespace CameraUtility.Tests
 
                 var filesCount = FilesWithMetadata.Count();
                 output.Should().EndWith(
-                    $"Found {filesCount} camera files. Processed {filesCount}. Skipped 0. Transferred {filesCount}.\n");
+                    $"Found {filesCount} camera file(s). Processed {filesCount}. Skipped 0. Transferred {filesCount}.\n");
 
 
                 void VerifyDirectoryCreatedAndFileCopied(
@@ -146,7 +146,7 @@ namespace CameraUtility.Tests
 
                 var filesCount = FilesWithMetadata.Count();
                 output.Should().EndWith(
-                    $"Found {filesCount} camera files. Processed {filesCount}. Skipped 0. Transferred {filesCount}.\n");
+                    $"Found {filesCount} camera file(s). Processed {filesCount}. Skipped 0. Transferred {filesCount}.\n");
 
 
                 void VerifyDirectoryCreatedAndFileCopied(
@@ -210,7 +210,59 @@ namespace CameraUtility.Tests
                 output.Should().EndWith(
                     "Skipped 1 file(s) because they already exist at the destination.\n" +
                     $"{fileWithMetadata.sourceFile} exists as {fileWithMetadata.expectedDestinationFile}\n\n" +
-                    "Found 1 camera files. Processed 1. Skipped 1. Transferred 0.\n");
+                    "Found 1 camera file(s). Processed 1. Skipped 1. Transferred 0.\n");
+            }
+            
+            [Fact]
+            public void Copy_overwrites_files_which_already_exist_in_the_destination_in_overwrite_mode()
+            {
+                /* Arrange */
+                var fileWithMetadata =
+                (
+                    sourceFile: $"{SourceDirPath}/IMG_1234.JPG",
+                    exifTags: NewImageFileTags("2010:01:12 13:14:15", "42"),
+                    expectedDestinationDirectory: $"{DestinationDirPath}/2010_01_12",
+                    expectedDestinationFile: $"{DestinationDirPath}/2010_01_12/IMG_20100112_131415420.JPG");
+                var fixture = new Fixture().Customize(new AutoMoqCustomization());
+                var fileSystemMock =
+                    fixture
+                        .Freeze<Mock<IFileSystem>>()
+                        .SetupDefaults()
+                        .SetupSourceDirectoryWithFiles(SourceDirPath, new[] {fileWithMetadata.sourceFile});
+                fileSystemMock
+                    .Setup(fs => fs.Directory.Exists(fileWithMetadata.expectedDestinationDirectory))
+                    .Returns(true);
+                fileSystemMock
+                    .Setup(fs => fs.File.Exists(fileWithMetadata.expectedDestinationFile))
+                    .Returns(true);
+                fixture
+                    .Freeze<Mock<IMetadataReader>>()
+                    .SetupMetadata(new[] {(fileWithMetadata.sourceFile, fileWithMetadata.exifTags)});
+                var consoleTextWriterMock = new StringWriter();
+                fixture.Inject<TextWriter>(consoleTextWriterMock);
+                var sut = fixture.Create<Program>();
+
+                /* Act */
+                var result = sut.Execute($"copy {SourceDirPath} {DestinationDirPath} --overwrite".Split());
+
+                /* Assert */
+                result.Should().Be(0);
+                var output = consoleTextWriterMock.ToString();
+                var (file, _, _, expectedDestinationFile) = fileWithMetadata;
+                VerifyDirectoryCreatedAndFileCopied(file, expectedDestinationFile);
+                output.Should().Contain($"{file} -> {expectedDestinationFile}");
+                output.Should().EndWith("Found 1 camera file(s). Processed 1. Skipped 0. Transferred 1.\n");
+                
+                void VerifyDirectoryCreatedAndFileCopied(
+                    string sourceFile,
+                    string destinationFile)
+                {
+                    fileSystemMock.Verify(fs =>
+                        fs.File.Copy(
+                            sourceFile,
+                            destinationFile,
+                            true));
+                }
             }
 
             [Fact]
@@ -277,7 +329,7 @@ namespace CameraUtility.Tests
 
                 var filesCount = FilesWithMetadata.Count();
                 output.Should().EndWith(
-                    $"Found {filesCount} camera files. Processed {filesCount}. Skipped 0. Transferred 0.\n");
+                    $"Found {filesCount} camera file(s). Processed {filesCount}. Skipped 0. Transferred 0.\n");
             }
 
             [Fact]
@@ -312,7 +364,7 @@ namespace CameraUtility.Tests
                 var output = consoleTextWriterMock.ToString();
                 output.Should().Be(
                     $"Failed {SourceDirPath}/IMG_1234.JPG: PROCESSING EXCEPTION\n\n" +
-                    "Found 2 camera files. Processed 1. Skipped 0. Transferred 0.\n");
+                    "Found 2 camera file(s). Processed 1. Skipped 0. Transferred 0.\n");
                 fileSystemMock.Verify(fs =>
                         fs.File.Copy(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()),
                     Times.Never);
@@ -368,7 +420,7 @@ namespace CameraUtility.Tests
                     "Following errors occurred:\n" +
                     $"{SourceDirPath}/IMG_1234.JPG: PROCESSING EXCEPTION\n" +
                     $"{SourceDirPath}/IMG_2345.jpg: Metadata not found\n\n" +
-                    "Found 3 camera files. Processed 3. Skipped 0. Transferred 1.\n");
+                    "Found 3 camera file(s). Processed 3. Skipped 0. Transferred 1.\n");
                 fileSystemMock.Verify(fs =>
                         fs.File.Copy($"{SourceDirPath}/IMG_1234.JPG", It.IsAny<string>(), It.IsAny<bool>()),
                     Times.Never);
@@ -426,7 +478,7 @@ namespace CameraUtility.Tests
                     $"{SourceDirPath}/IMG_1234.JPG -> {DestinationDirPath}/2010_01_12/IMG_20100112_131415420.JPG\n" +
                     $"Created {DestinationDirPath}/2011_02_13\n" +
                     $"{SourceDirPath}/IMG_4231.JPEG -> {DestinationDirPath}/2011_02_13/IMG_20110213_141516430.JPEG\n\n" +
-                    "Found 3 camera files. Processed 2. Skipped 0. Transferred 2.\n" +
+                    "Found 3 camera file(s). Processed 2. Skipped 0. Transferred 2.\n" +
                     "Operation interrupted by user.\n");
                 fileSystemMock.Verify(fs =>
                     fs.File.Copy(
@@ -499,7 +551,7 @@ namespace CameraUtility.Tests
 
                 var filesCount = FilesWithMetadata.Count();
                 output.Should().EndWith(
-                    $"Found {filesCount} camera files. Processed {filesCount}. Skipped 0. Transferred {filesCount}.\n");
+                    $"Found {filesCount} camera file(s). Processed {filesCount}. Skipped 0. Transferred {filesCount}.\n");
 
 
                 void VerifyDirectoryCreatedAndFileCopied(

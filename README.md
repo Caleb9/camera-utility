@@ -112,7 +112,9 @@ Options:                                                                    │
   -k, --keep-going      Try to continue operation when errors for           │
                         individual files occur.                             │
   --skip-date-subdir    Do not create date sub-directories in destination   │
-                        directory.
+                        directory.                                          │
+  --overwrite           Transfer files even if they already exist in        │
+                        destination.
 ```
 
 The `<src-path>` and `<dst-dir>` are the only required
@@ -169,5 +171,5 @@ etc.
 
 ## Things to Do
 
-* Force-overwrite mode.
-* List of individual files as input.
+* List of multiple individual files as input (currently only a single
+  file or entire directory is supported)

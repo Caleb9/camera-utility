@@ -26,7 +26,7 @@ namespace CameraUtility.Commands.ImageFilesTransfer
         internal Result<(string destinationDirectory, string destinationFileName)> Convert(
             CameraFileTransferer.Args args)
         {
-            var (cameraFilePath, destinationRootDirectory, _, skipDateSubdirectoryOption) = args;
+            var (cameraFilePath, destinationRootDirectory, _, skipDateSubdirectoryOption, _) = args;
             var cameraFileResult = GetCameraFile(cameraFilePath);
             if (cameraFileResult.IsFailure)
             {

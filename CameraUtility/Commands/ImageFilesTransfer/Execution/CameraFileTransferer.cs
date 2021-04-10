@@ -39,7 +39,7 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
             var destinationFilePath =
                 new CameraFilePath(_fileSystem.Path.Combine(destinationDirectory, destinationFileName));
             var destinationAlreadyExists = _fileSystem.File.Exists(destinationFilePath);
-            if (destinationAlreadyExists)
+            if (destinationAlreadyExists && !args.Overwrite)
             {
                 OnFileSkipped(this, (args.CameraFilePath, destinationFilePath));
                 return Result.Success();
@@ -47,7 +47,7 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
 
             if (!args.DryRun)
             {
-                _transferFiles(args.CameraFilePath, destinationFilePath);
+                _transferFiles(args.CameraFilePath, destinationFilePath, args.Overwrite);
             }
 
             OnFileTransferred(this, (args.CameraFilePath, destinationFilePath, args.DryRun));
@@ -66,12 +66,13 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Execution
         internal delegate void TransferFiles(
             CameraFilePath sourcePath,
             CameraFilePath destinationPath,
-            bool overwrite = false);
+            bool overwrite);
 
         internal sealed record Args(
             CameraFilePath CameraFilePath,
             DestinationDirectory DestinationRootDirectory,
             DryRun DryRun,
-            SkipDateSubdirectory SkipDateSubdirectory);
+            SkipDateSubdirectory SkipDateSubdirectory,
+            Overwrite Overwrite);
     }
 }

@@ -131,7 +131,7 @@ namespace CameraUtility.Commands.ImageFilesTransfer.Output
             _textWriter.WriteLine();
             Console.ForegroundColor = _errors.Any() ? ConsoleColor.Red : ConsoleColor.Green;
             _textWriter.WriteLine(
-                $"Found {_cameraFilesFound} camera files. " +
+                $"Found {_cameraFilesFound} camera file(s). " +
                 $"Processed {_cameraFilesProcessed}. " +
                 $"Skipped {_cameraFilesSkipped.Count}. " +
                 $"Transferred {_cameraFilesTransferred}.");

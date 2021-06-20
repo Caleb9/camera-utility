@@ -18,16 +18,8 @@ namespace CameraUtility.Tests.CameraFiles
         {
             var exifTags = new[]
             {
-                new Tag
-                {
-                    Type = 0x9003,
-                    Value = "2021:04:05 10:56:13"
-                },
-                new Tag
-                {
-                    Type = 0x9291,
-                    Value = subSecondsTagValue
-                }
+                new TestTag(0x9003, "2021:04:05 10:56:13"),
+                new TestTag(0x9291, subSecondsTagValue)
             };
             
             var sut = ImageFile.Create(new CameraFilePath("file.jpg"), exifTags).Value;
@@ -36,18 +28,11 @@ namespace CameraUtility.Tests.CameraFiles
             sut.Created.Should().Be(expected);
         }
 
-        private sealed class Tag :
+        private sealed record TestTag(
+            int Type,
+            string Value) :
             ITag
         {
-            public int Type { get; internal init; }
-            public string Directory => string.Empty;
-            public string Value { get; internal init; } = string.Empty;
-        }
-
-        private sealed record TestTag(string Value) :
-            ITag
-        {
-            public int Type => 0x9003;
             public string Directory => string.Empty;
         }
     }

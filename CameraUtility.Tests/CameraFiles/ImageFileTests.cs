@@ -41,7 +41,7 @@ namespace CameraUtility.Tests.CameraFiles
         {
             public int Type { get; internal init; }
             public string Directory => string.Empty;
-            public string Value { get; internal init; }
+            public string Value { get; internal init; } = string.Empty;
         }
 
         private sealed record TestTag(string Value) :

@@ -40,10 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpFunctionalExtensions" Version="2.16.0" />
-    <PackageReference Include="MetadataExtractor" Version="2.5.0" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21216.1" />
-    <PackageReference Include="System.IO.Abstractions" Version="13.2.38" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.19.0" />
+    <PackageReference Include="MetadataExtractor" Version="2.7.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.43" />
   </ItemGroup>
 
 </Project>

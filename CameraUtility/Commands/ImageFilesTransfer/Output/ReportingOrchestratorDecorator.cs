@@ -1,32 +1,31 @@
 using CameraUtility.Commands.ImageFilesTransfer.Execution;
 
-namespace CameraUtility.Commands.ImageFilesTransfer.Output
+namespace CameraUtility.Commands.ImageFilesTransfer.Output;
+
+internal sealed class ReportingOrchestratorDecorator :
+    IOrchestrator
 {
-    internal sealed class ReportingOrchestratorDecorator :
-        IOrchestrator
+    private readonly IOrchestrator _decorated;
+    private readonly Report _report;
+
+    internal ReportingOrchestratorDecorator(
+        IOrchestrator decorated,
+        Report report)
     {
-        private readonly IOrchestrator _decorated;
-        private readonly Report _report;
+        _decorated = decorated;
+        _report = report;
+    }
 
-        internal ReportingOrchestratorDecorator(
-            IOrchestrator decorated,
-            Report report)
+    int IOrchestrator.Execute(
+        AbstractTransferImageFilesCommand.OptionArgs args)
+    {
+        try
         {
-            _decorated = decorated;
-            _report = report;
+            return _decorated.Execute(args);
         }
-
-        int IOrchestrator.Execute(
-            AbstractTransferImageFilesCommand.OptionArgs args)
+        finally
         {
-            try
-            {
-                return _decorated.Execute(args);
-            }
-            finally
-            {
-                _report.PrintReport(args.KeepGoing);
-            }
+            _report.PrintReport(args.KeepGoing);
         }
     }
 }

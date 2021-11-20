@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
+﻿namespace CameraUtility.Exif;
 
-namespace CameraUtility.Exif
+/// <summary>
+///     Isolates 3-rd party MetadataExtractor library for accessing metadata of image and video files.
+/// </summary>
+public interface IMetadataReader
 {
     /// <summary>
-    ///     Isolates 3-rd party MetadataExtractor library for accessing metadata of image and video files.
+    ///     Returns all tags found in file's Exif metadata.
     /// </summary>
-    public interface IMetadataReader
-    {
-        /// <summary>
-        ///     Returns all tags found in file's Exif metadata.
-        /// </summary>
-        IEnumerable<ITag> ExtractTags(
-            CameraFilePath filePath);
-    }
+    IEnumerable<ITag> ExtractTags(
+        CameraFilePath filePath);
 }

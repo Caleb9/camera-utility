@@ -1,13 +1,10 @@
-﻿using System;
+﻿namespace CameraUtility.CameraFiles;
 
-namespace CameraUtility.CameraFiles
+public interface ICameraFile
 {
-    public interface ICameraFile
-    {
-        CameraFilePath FullName { get; }
-        string Extension { get; }
-        DateTime Created { get; }
+    CameraFilePath FullName { get; }
+    string Extension { get; }
+    DateTime Created { get; }
 
-        string DestinationNamePrefix { get; }
-    }
+    string DestinationNamePrefix { get; }
 }

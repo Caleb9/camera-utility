@@ -1,52 +1,49 @@
-using System;
-using System.IO;
+namespace CameraUtility.Commands;
 
-namespace CameraUtility.Commands
+internal abstract class ConsoleOutputBase
 {
-    internal abstract class ConsoleOutputBase
+    private readonly TextWriter _textWriter;
+
+    protected internal ConsoleOutputBase(
+        TextWriter textWriter)
     {
-        private readonly TextWriter _textWriter;
+        _textWriter = textWriter;
+    }
 
-        protected internal ConsoleOutputBase(
-            TextWriter textWriter)
+    protected void WriteLine(
+        string? line = default,
+        ConsoleColor? color = default)
+    {
+        PrivateWrite(line, _textWriter.WriteLine, color);
+    }
+
+    protected void Write(
+        string line,
+        ConsoleColor? color = default)
+    {
+        PrivateWrite(line, _textWriter.Write, color);
+    }
+
+    private static void PrivateWrite(
+        string? line,
+        Action<string?> writeMethod,
+        ConsoleColor? color)
+    {
+        if (color.HasValue is false)
         {
-            _textWriter = textWriter;
+            writeMethod(line);
+            return;
         }
 
-        protected void WriteLine(
-            string? line = default,
-            ConsoleColor? color = default)
+        var currentColor = Console.ForegroundColor;
+        try
         {
-            PrivateWrite(line, _textWriter.WriteLine, color);
+            Console.ForegroundColor = color!.Value;
+            writeMethod(line);
         }
-
-        protected void Write(
-            string line,
-            ConsoleColor? color = default)
+        finally
         {
-            PrivateWrite(line, _textWriter.Write, color);
-        }
-
-        private static void PrivateWrite(
-            string? line,
-            Action<string?> writeMethod,
-            ConsoleColor? color)
-        {
-            if (color.HasValue is false)
-            {
-                writeMethod(line);
-                return;
-            }
-            var currentColor = Console.ForegroundColor;
-            try
-            {
-                Console.ForegroundColor = color!.Value;
-                writeMethod(line);
-            }
-            finally
-            {
-                Console.ForegroundColor = currentColor;
-            }
+            Console.ForegroundColor = currentColor;
         }
     }
 }

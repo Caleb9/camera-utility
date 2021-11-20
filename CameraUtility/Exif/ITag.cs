@@ -1,17 +1,16 @@
-﻿namespace CameraUtility.Exif
+﻿namespace CameraUtility.Exif;
+
+/// <summary>
+///     Isolates MetadataExtractor.Tag type.
+/// </summary>
+public interface ITag
 {
+    int Type { get; }
+
     /// <summary>
-    ///     Isolates MetadataExtractor.Tag type.
+    ///     Exif metadata directory.
     /// </summary>
-    public interface ITag
-    {
-        int Type { get; }
+    string Directory { get; }
 
-        /// <summary>
-        ///     Exif metadata directory.
-        /// </summary>
-        string Directory { get; }
-
-        string Value { get; }
-    }
+    string Value { get; }
 }

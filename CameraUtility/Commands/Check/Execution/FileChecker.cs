@@ -1,64 +1,61 @@
-using System.Collections.Generic;
-using System.Linq;
 using CameraUtility.CameraFiles;
 using CameraUtility.Commands.Check.Output;
 using CameraUtility.Exif;
 
-namespace CameraUtility.Commands.Check.Execution
+namespace CameraUtility.Commands.Check.Execution;
+
+internal sealed class FileChecker
 {
-    internal sealed class FileChecker
+    private const int NoErrorsResultCode = 0;
+    private const int ErrorResultCode = 3;
+    private readonly CameraFileFactory _cameraFileFactory;
+
+    private readonly CameraFilesFinder _cameraFilesFinder;
+
+    private readonly List<CameraFilePath> _cameraFilesWithoutMetadata = new();
+    private readonly ConsoleOutput _consoleOutput;
+    private readonly IMetadataReader _metadataReader;
+
+    internal FileChecker(
+        CameraFilesFinder cameraFilesFinder,
+        IMetadataReader metadataReader,
+        CameraFileFactory cameraFileFactory,
+        ConsoleOutput consoleOutput)
     {
-        private const int NoErrorsResultCode = 0;
-        private const int ErrorResultCode = 3;
+        _cameraFilesFinder = cameraFilesFinder;
+        _metadataReader = metadataReader;
+        _cameraFileFactory = cameraFileFactory;
+        _consoleOutput = consoleOutput;
+    }
 
-        private readonly CameraFilesFinder _cameraFilesFinder;
-        private readonly IMetadataReader _metadataReader;
-        private readonly CameraFileFactory _cameraFileFactory;
-        private readonly ConsoleOutput _consoleOutput;
-
-        private readonly List<CameraFilePath> _cameraFilesWithoutMetadata = new();
-        
-        internal FileChecker(
-            CameraFilesFinder cameraFilesFinder,
-            IMetadataReader metadataReader,
-            CameraFileFactory cameraFileFactory,
-            ConsoleOutput consoleOutput)
+    internal int Execute(CheckCommand.OptionArgs args)
+    {
+        long filesCounter = 0;
+        foreach (var sourcePath in args.SourcePaths.Value)
         {
-            _cameraFilesFinder = cameraFilesFinder;
-            _metadataReader = metadataReader;
-            _cameraFileFactory = cameraFileFactory;
-            _consoleOutput = consoleOutput;
-        }
-
-        internal int Execute(CheckCommand.OptionArgs args)
-        {
-            long filesCounter = 0;
-            foreach (var sourcePath in args.SourcePaths.Value)
+            var cameraFilesResult = _cameraFilesFinder.FindCameraFiles(sourcePath);
+            if (cameraFilesResult.IsFailure)
             {
-                var cameraFilesResult = _cameraFilesFinder.FindCameraFiles(sourcePath);
-                if (cameraFilesResult.IsFailure)
-                {
-                    _consoleOutput.PrintError(cameraFilesResult.Error);
-                    return ErrorResultCode;
-                }
+                _consoleOutput.PrintError(cameraFilesResult.Error);
+                return ErrorResultCode;
+            }
 
-                filesCounter += cameraFilesResult.Value.Count();
-                foreach (var cameraFilePath in cameraFilesResult.Value)
+            filesCounter += cameraFilesResult.Value.Count();
+            foreach (var cameraFilePath in cameraFilesResult.Value)
+            {
+                var exifTags = _metadataReader.ExtractTags(cameraFilePath);
+                var cameraFileResult = _cameraFileFactory.Create(cameraFilePath, exifTags);
+                if (cameraFileResult.IsFailure)
                 {
-                    var exifTags = _metadataReader.ExtractTags(cameraFilePath);
-                    var cameraFileResult = _cameraFileFactory.Create(cameraFilePath, exifTags);
-                    if (cameraFileResult.IsFailure)
-                    {
-                        _cameraFilesWithoutMetadata.Add(cameraFilePath);
-                    }
+                    _cameraFilesWithoutMetadata.Add(cameraFilePath);
                 }
             }
-            
-            _consoleOutput.PrintSummary(
-                filesCounter,
-                _cameraFilesWithoutMetadata);
-
-            return NoErrorsResultCode;
         }
+
+        _consoleOutput.PrintSummary(
+            filesCounter,
+            _cameraFilesWithoutMetadata);
+
+        return NoErrorsResultCode;
     }
 }

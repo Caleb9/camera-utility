@@ -1,76 +1,72 @@
-using System;
-using System.Threading;
+namespace CameraUtility.Commands.ImageFilesTransfer.Execution;
 
-namespace CameraUtility.Commands.ImageFilesTransfer.Execution
+internal sealed class Orchestrator :
+    IOrchestrator
 {
-    internal sealed class Orchestrator :
-        IOrchestrator
-    {
-        private const int NoErrorsResultCode = 0;
-        private const int ErrorResultCode = 2;
-        private readonly CameraFilesFinder _cameraFilesFinder;
-        private readonly CameraFileTransferer _cameraFileTransferer;
-        private readonly CancellationToken _cancellationToken;
+    private const int NoErrorsResultCode = 0;
+    private const int ErrorResultCode = 2;
+    private readonly CameraFilesFinder _cameraFilesFinder;
+    private readonly CameraFileTransferer _cameraFileTransferer;
+    private readonly CancellationToken _cancellationToken;
 
-        internal Orchestrator(
-            CameraFilesFinder cameraFilesFinder,
-            CameraFileTransferer cameraFileTransferer,
-            CancellationToken cancellationToken)
+    internal Orchestrator(
+        CameraFilesFinder cameraFilesFinder,
+        CameraFileTransferer cameraFileTransferer,
+        CancellationToken cancellationToken)
+    {
+        _cameraFilesFinder = cameraFilesFinder;
+        _cameraFileTransferer = cameraFileTransferer;
+        _cancellationToken = cancellationToken;
+    }
+
+    int IOrchestrator.Execute(AbstractTransferImageFilesCommand.OptionArgs args)
+    {
+        var cameraFilePathsResult = _cameraFilesFinder.FindCameraFiles(args.SourcePath);
+        if (cameraFilePathsResult.IsFailure)
         {
-            _cameraFilesFinder = cameraFilesFinder;
-            _cameraFileTransferer = cameraFileTransferer;
-            _cancellationToken = cancellationToken;
+            OnError(this, (null, cameraFilePathsResult.Error));
+            return ErrorResultCode;
         }
 
-        int IOrchestrator.Execute(AbstractTransferImageFilesCommand.OptionArgs args)
+        var result = NoErrorsResultCode;
+        foreach (var cameraFilePath in cameraFilePathsResult.Value)
         {
-            var cameraFilePathsResult = _cameraFilesFinder.FindCameraFiles(args.SourcePath);
-            if (cameraFilePathsResult.IsFailure)
+            _cancellationToken.ThrowIfCancellationRequested();
+            try
             {
-                OnError(this, (null, cameraFilePathsResult.Error));
-                return ErrorResultCode;
-            }
-
-            var result = NoErrorsResultCode;
-            foreach (var cameraFilePath in cameraFilePathsResult.Value)
-            {
-                _cancellationToken.ThrowIfCancellationRequested();
-                try
+                var transferResult =
+                    _cameraFileTransferer.TransferFile(
+                        new CameraFileTransferer.Args(
+                            cameraFilePath,
+                            args.DestinationDirectory,
+                            args.DryRun,
+                            args.SkipDateSubdirectory,
+                            args.Overwrite));
+                if (transferResult.IsFailure)
                 {
-                    var transferResult =
-                        _cameraFileTransferer.TransferFile(
-                            new CameraFileTransferer.Args(
-                                cameraFilePath,
-                                args.DestinationDirectory,
-                                args.DryRun,
-                                args.SkipDateSubdirectory,
-                                args.Overwrite));
-                    if (transferResult.IsFailure)
-                    {
-                        OnError(this, (cameraFilePath, transferResult.Error));
-                        if (!args.KeepGoing)
-                        {
-                            return ErrorResultCode;
-                        }
-                    }
-                }
-                catch (Exception exception)
-                {
-                    OnException(this, (cameraFilePath, exception));
+                    OnError(this, (cameraFilePath, transferResult.Error));
                     if (!args.KeepGoing)
                     {
                         return ErrorResultCode;
                     }
-
-                    result = ErrorResultCode;
                 }
             }
+            catch (Exception exception)
+            {
+                OnException(this, (cameraFilePath, exception));
+                if (!args.KeepGoing)
+                {
+                    return ErrorResultCode;
+                }
 
-            return result;
+                result = ErrorResultCode;
+            }
         }
 
-        internal event EventHandler<(CameraFilePath? filePath, string error)> OnError = (_, _) => { };
-
-        internal event EventHandler<(CameraFilePath filePath, Exception exception)> OnException = (_, _) => { };
+        return result;
     }
+
+    internal event EventHandler<(CameraFilePath? filePath, string error)> OnError = (_, _) => { };
+
+    internal event EventHandler<(CameraFilePath filePath, Exception exception)> OnException = (_, _) => { };
 }

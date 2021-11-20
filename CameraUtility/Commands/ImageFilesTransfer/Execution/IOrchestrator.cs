@@ -1,7 +1,6 @@
-namespace CameraUtility.Commands.ImageFilesTransfer.Execution
+namespace CameraUtility.Commands.ImageFilesTransfer.Execution;
+
+internal interface IOrchestrator
 {
-    internal interface IOrchestrator
-    {
-        int Execute(AbstractTransferImageFilesCommand.OptionArgs args);
-    }
+    int Execute(AbstractTransferImageFilesCommand.OptionArgs args);
 }

@@ -6,7 +6,7 @@ init:
   - git config --global core.autocrlf true
 
 install:
-  - dotnet tool install --global --version 5.6.6 gitversion.tool
+  - dotnet tool install --global --version 5.8.1 gitversion.tool
 
 before_build:
   # Display versions of used tools
@@ -51,8 +51,11 @@ matrix:
 configuration: Release
 
 test_script:
-  - dotnet test --verbosity m --configuration $CONFIGURATION
-    --runtime $CameraUtility_runtime --logger:AppVeyor;
+  - dotnet test
+    --verbosity m
+    --configuration $CONFIGURATION
+    --runtime $CameraUtility_runtime
+    --logger:AppVeyor
 
 after_test:
   - dotnet publish
@@ -60,11 +63,10 @@ after_test:
     --configuration $CONFIGURATION
     --runtime $CameraUtility_runtime
     --output $CameraUtility_PublishFolder
+    --self-contained
     $CameraUtility_ConsoleAppProject
     /p:PublishSingleFile=true
-    /p:PublishTrimmed=true
     /p:DebugType=None
-    /p:IncludeNativeLibrariesForSelfExtract=true
   - 7z a $CameraUtility_ConsoleAppName-$GitVersion_FullSemVer-$CameraUtility_runtime.zip
     $APPVEYOR_BUILD_FOLDER/$CameraUtility_PublishFolder/* $APPVEYOR_BUILD_FOLDER/LICENSE.txt
 

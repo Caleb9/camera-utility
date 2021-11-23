@@ -5,9 +5,9 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <WarningsAsErrors />
         <ImplicitUsings>enable</ImplicitUsings>
+<!--        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+        <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -37,7 +37,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CSharpFunctionalExtensions" Version="2.25.0" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="2.26.0" />
         <PackageReference Include="MetadataExtractor" Version="2.7.1" />
         <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
         <PackageReference Include="System.IO.Abstractions" Version="13.2.47" />

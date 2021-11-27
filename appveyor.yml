@@ -65,7 +65,6 @@ after_test:
     --output $CameraUtility_PublishFolder
     --self-contained
     $CameraUtility_ConsoleAppProject
-    /p:PublishSingleFile=true
     /p:DebugType=None
   - 7z a $CameraUtility_ConsoleAppName-$GitVersion_FullSemVer-$CameraUtility_runtime.zip
     $APPVEYOR_BUILD_FOLDER/$CameraUtility_PublishFolder/* $APPVEYOR_BUILD_FOLDER/LICENSE.txt
